@@ -16,7 +16,7 @@ beforeEach(async () => {
 
 const testTripRequiredProperty = testRequiredProperty(createTrip);
 
-describe.only('The trip', () => {
+describe('The trip', () => {
   it('should not be saved without a destination', async () => {
     await testTripRequiredProperty('destination');
   });

@@ -14,7 +14,9 @@
     "bcrypt": "^3.0.0",
     "moment": "^2.22.2",
     "mongoose": "^5.2.7",
-    "validator": "^10.5.0"
+    "rest-api-errors": "^1.2.1",
+    "validator": "^10.5.0",
+    "virgen-acl": "^0.0.22"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

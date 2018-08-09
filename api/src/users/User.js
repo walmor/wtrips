@@ -57,6 +57,14 @@ userSchema.methods.comparePassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.getRoleId = function () {
+  return this.role;
+};
+
+userSchema.methods.getResourceId = function () {
+  return 'user';
+};
+
 const User = mongoose.model('User', userSchema);
 
 export default User;

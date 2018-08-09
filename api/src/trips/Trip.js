@@ -26,6 +26,10 @@ tripSchema.virtual('daysLeft').get(function () {
   return diff >= 0 ? diff : null;
 });
 
+tripSchema.methods.getResourceId = function () {
+  return 'trip';
+};
+
 tripSchema.set('toObject', { virtuals: true });
 tripSchema.set('toJSON', { virtuals: true });
 

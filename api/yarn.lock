@@ -4338,6 +4338,10 @@ resolve@^1.5.0, resolve@^1.6.0:
   dependencies:
     path-parse "^1.0.5"
 
+rest-api-errors@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/rest-api-errors/-/rest-api-errors-1.2.1.tgz#36d4f709b66f39a40a2fca580ba4fdabe41aa3e7"
+
 restore-cursor@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-2.0.0.tgz#9f7ee287f82fd326d4fd162923d62129eee0dfaf"
@@ -5058,6 +5062,10 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+virgen-acl@^0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/virgen-acl/-/virgen-acl-0.0.22.tgz#24246cd60ae8d917a817a7865a08624dfad49ee8"
 
 vue-eslint-parser@^2.0.2:
   version "2.0.3"
