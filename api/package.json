@@ -10,7 +10,11 @@
   },
   "author": "Walmor Moreira",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "bcrypt": "^3.0.0",
+    "mongoose": "^5.2.7",
+    "validator": "^10.5.0"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -22,12 +26,14 @@
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
     "jest": "^23.4.2",
+    "mongodb-memory-server": "^1.9.3",
     "nodemon": "^1.18.3",
     "prettier-eslint": "^8.8.2"
   },
   "jest": {
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
+      "<rootDir>/src/__tests__/utils/",
       "<rootDir>/node_modules/"
     ]
   }
