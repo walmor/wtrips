@@ -1,5 +1,5 @@
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
-import User from './User';
+import { createUser, testRequiredProperty } from '../__tests__/utils/helpers';
 
 beforeAll(async () => {
   await mongodbInMemory.init();
@@ -13,46 +13,21 @@ beforeEach(async () => {
   await mongodbInMemory.clearDatabase();
 });
 
-function createUser(props) {
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    role: 'user',
-    password: '123456',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    lastIPAddress: '189.100.242.238',
-  };
-
-  return new User(Object.assign(user, props));
-}
-
-async function testRequiredProperty(propName) {
-  expect.assertions(2);
-
-  const user = createUser({ [propName]: null });
-
-  try {
-    await user.save();
-  } catch (error) {
-    expect(error.errors[propName]).toBeDefined();
-    expect(error.errors[propName].kind).toBe('required');
-  }
-}
+const testUserRequiredProperty = testRequiredProperty(createUser);
 
 describe('The user', async () => {
   it('should not be saved without a name', async () => {
-    await testRequiredProperty('name');
+    await testUserRequiredProperty('name');
   });
 
   it('should not be saved without an email', async () => {
-    await testRequiredProperty('email');
+    await testUserRequiredProperty('email');
   });
 
   it('should not be saved with an invalid email', async () => {
     expect.assertions(2);
 
-    const user = createUser({ email: 'invalid-email' });
+    const user = await createUser({ email: 'invalid-email' });
 
     try {
       await user.save();
@@ -66,8 +41,8 @@ describe('The user', async () => {
     expect.assertions(2);
     const email = 'test@example.com';
 
-    const user1 = createUser({ email });
-    const user2 = createUser({ email });
+    const user1 = await createUser({ email });
+    const user2 = await createUser({ email });
 
     await user1.save();
 
@@ -81,25 +56,25 @@ describe('The user', async () => {
   });
 
   it('should not be saved without a password', async () => {
-    await testRequiredProperty('password');
+    await testUserRequiredProperty('password');
   });
 
   it('should not be saved without a creation date', async () => {
-    await testRequiredProperty('createdAt');
+    await testUserRequiredProperty('createdAt');
   });
 
   it('should not be saved without an update date', async () => {
-    await testRequiredProperty('updatedAt');
+    await testUserRequiredProperty('updatedAt');
   });
 
   it('should not be saved without an IP address', async () => {
-    await testRequiredProperty('lastIPAddress');
+    await testUserRequiredProperty('lastIPAddress');
   });
 
   it('should not be saved with an invalid IP address', async () => {
     expect.assertions(2);
 
-    const user = createUser({ lastIPAddress: 'invalid-ip-address' });
+    const user = await createUser({ lastIPAddress: 'invalid-ip-address' });
 
     try {
       await user.save();
@@ -110,7 +85,7 @@ describe('The user', async () => {
   });
 
   it('should not have its creation date updated', async () => {
-    const user = createUser();
+    const user = await createUser();
     const savedUser = await user.save();
     const { createdAt } = savedUser;
 
@@ -125,7 +100,7 @@ describe('The user', async () => {
 
   it('should be saved with encrypted password', async () => {
     const password = '123456';
-    const user = createUser({ password });
+    const user = await createUser({ password });
     const savedUser = await user.save();
 
     expect(savedUser.password).not.toBeFalsy();
@@ -133,14 +108,14 @@ describe('The user', async () => {
   });
 
   it('should be saved when is valid', async () => {
-    const user = createUser();
-    const savedUser = await user.save();
-    expect(savedUser.id).toBeTruthy();
+    const user = await createUser();
+    await user.save();
+    expect(user.id).toBeTruthy();
   });
 
   it('should be able to compare passwords', async () => {
     const password = '123456';
-    const user = createUser({ password });
+    const user = await createUser({ password });
     const savedUser = await user.save();
 
     expect(await savedUser.comparePassword(password)).toBe(true);
