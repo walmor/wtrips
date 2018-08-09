@@ -1,0 +1,19 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "node": "current"
+        }
+      }
+    ]
+  ],
+  "plugins": ["transform-object-rest-spread"],
+  "env": {
+    "test": {
+      "retainLines": true
+    }
+  },
+  "sourceMaps": true
+}
