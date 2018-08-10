@@ -1,3 +1,4 @@
+import casual from 'casual';
 import User from '../../users/User';
 import Trip from '../../trips/Trip';
 
@@ -7,12 +8,26 @@ async function createUser(props) {
     email: 'john@example.com',
     role: 'user',
     password: '123456',
+    isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
     lastIPAddress: '189.100.242.238',
   };
 
   return Promise.resolve(new User(Object.assign(user, props)));
+}
+
+async function createUsers(qty) {
+  const users = [];
+
+  /* eslint-disable no-await-in-loop */
+  for (let i = 0; i < qty; i++) {
+    const user = await createUser({ name: casual.name, email: casual.email });
+    await user.save();
+    users.push(user);
+  }
+
+  return users;
 }
 
 async function createTrip(props) {
@@ -47,4 +62,6 @@ function testRequiredProperty(createModel) {
   };
 }
 
-export { createUser, createTrip, testRequiredProperty };
+export {
+  createUser, createUsers, createTrip, testRequiredProperty,
+};
