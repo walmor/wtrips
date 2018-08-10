@@ -4,8 +4,8 @@ import Trip from '../../trips/Trip';
 
 async function createUser(props) {
   const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
+    name: casual.name,
+    email: casual.email,
     role: 'user',
     password: '123456',
     isActive: true,
@@ -47,6 +47,30 @@ async function createTrip(props) {
   return new Trip(Object.assign(trip, props));
 }
 
+async function createTrips(qty) {
+  const trips = [];
+
+  /* eslint-disable no-await-in-loop */
+  for (let i = 0; i < qty; i++) {
+    const destination = casual.country;
+    const date = casual.moment;
+    const startDate = date.toDate();
+    const endDate = date.add(casual.integer(1, 30), 'days').toDate();
+
+    const props = {
+      destination,
+      startDate,
+      endDate,
+    };
+
+    const trip = await createTrip(props);
+    await trip.save();
+    trips.push(trip);
+  }
+
+  return trips;
+}
+
 function testRequiredProperty(createModel) {
   return async (propName) => {
     expect.assertions(2);
@@ -63,5 +87,5 @@ function testRequiredProperty(createModel) {
 }
 
 export {
-  createUser, createUsers, createTrip, testRequiredProperty,
+  createUser, createUsers, createTrip, createTrips, testRequiredProperty,
 };
