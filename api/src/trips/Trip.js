@@ -26,12 +26,18 @@ tripSchema.virtual('daysLeft').get(function () {
   return diff >= 0 ? diff : null;
 });
 
+tripSchema.set('toObject', {
+  virtuals: true,
+  versionKey: false,
+  transform(doc, ret) {
+    delete ret.id;
+    return ret;
+  },
+});
+
 tripSchema.methods.getResourceId = function () {
   return 'trip';
 };
-
-tripSchema.set('toObject', { virtuals: true });
-tripSchema.set('toJSON', { virtuals: true });
 
 const Trip = mongoose.model('Trip', tripSchema);
 
