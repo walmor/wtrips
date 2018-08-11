@@ -108,7 +108,7 @@ class UserService {
   }
 
   async ensureAuthorized(action, resource) {
-    ensureAuthorized(this.currUser, resource || 'user', action);
+    await ensureAuthorized(this.currUser, resource || 'user', action);
   }
 }
 
