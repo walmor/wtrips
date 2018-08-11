@@ -15,7 +15,7 @@ class TripService {
 
     tripData.user = tripData.userId || this.currUser.id;
 
-    const now = new Date();
+    const now = moment.utc().toDate();
     const dates = { createdAt: now, updatedAt: now };
 
     const trip = new Trip({ ...tripData, ...dates });
@@ -32,7 +32,8 @@ class TripService {
       throw new BadRequest('The trip user cannot be changed.');
     }
 
-    trip.set({ ...tripData, ...{ updatedAt: new Date() } });
+    const now = moment.utc().toDate();
+    trip.set({ ...tripData, ...{ updatedAt: now } });
 
     return this.saveTrip(trip);
   }
@@ -122,8 +123,8 @@ class TripService {
     const page = parseInt(opts.page || 1, 10);
     const pageSize = parseInt(opts.pageSize || 20, 10);
 
-    const startDate = opts.startDate ? moment(opts.startDate) : null;
-    const endDate = opts.endDate ? moment(opts.endDate) : null;
+    const startDate = opts.startDate ? moment.utc(opts.startDate) : null;
+    const endDate = opts.endDate ? moment.utc(opts.endDate).endOf('day') : null;
     const sort = opts.sort || 'startDate:asc';
 
     if (!Number.isInteger(page) || page < 1) {
@@ -175,8 +176,8 @@ class TripService {
   getTravelPlanBaseDate(options) {
     const opts = options || {};
 
-    const currMonth = moment().month() + 1;
-    const currYear = moment().year();
+    const currMonth = moment.utc().month() + 1;
+    const currYear = moment.utc().year();
 
     const month = parseInt(opts.month || currMonth, 10);
     const year = parseInt(opts.year || currYear, 10);
@@ -190,12 +191,12 @@ class TripService {
     }
 
     if (year === currYear && month === currMonth) {
-      return moment().startOf('day');
+      return moment.utc().startOf('day');
     }
 
-    const baseDate = moment(new Date(year, month - 1, 1));
+    const baseDate = moment.utc([year, month - 1, 1]);
 
-    if (baseDate.isBefore(moment())) {
+    if (baseDate.isBefore(moment.utc())) {
       throw new BadRequest('The filter date should be greater than the current date.');
     }
 
@@ -211,7 +212,7 @@ class TripService {
       throw badRequest;
     }
 
-    if (moment(trip.endDate).diff(trip.startDate, 'days') < 0) {
+    if (moment.utc(trip.endDate).diff(trip.startDate, 'days') < 0) {
       throw new BadRequest('The end date should be less than or equal to the start date.');
     }
 

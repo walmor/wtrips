@@ -18,8 +18,8 @@ const tripSchema = new Schema({
 });
 
 tripSchema.virtual('daysLeft').get(function () {
-  const today = moment().startOf('day');
-  const startDate = moment(this.startDate);
+  const today = moment.utc().startOf('day');
+  const startDate = moment.utc(this.startDate);
 
   const diff = startDate.diff(today, 'days');
 

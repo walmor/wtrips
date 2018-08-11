@@ -65,7 +65,8 @@ describe('The trip', () => {
 
   describe('when calculating the days left before it starts', () => {
     it('should return the number of days if it is a future trip', async () => {
-      const startDate = moment()
+      const startDate = moment
+        .utc()
         .startOf('day')
         .add(10, 'days')
         .toDate();
@@ -76,7 +77,8 @@ describe('The trip', () => {
     });
 
     it('should return null if it is a past trip', async () => {
-      const startDate = moment()
+      const startDate = moment
+        .utc()
         .startOf('day')
         .add(-1, 'days')
         .toDate();
@@ -87,7 +89,8 @@ describe('The trip', () => {
     });
 
     it('should return zero if the trip starts today', async () => {
-      const startDate = moment()
+      const startDate = moment
+        .utc()
         .startOf('day')
         .toDate();
 
