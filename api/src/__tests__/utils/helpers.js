@@ -31,8 +31,16 @@ async function createUsers(qty) {
 }
 
 async function createTrip(props) {
-  const user = await createUser();
-  await user.save();
+  let user = null;
+
+  if (props) {
+    ({ user } = props);
+  }
+
+  if (!user) {
+    user = await createUser();
+    await user.save();
+  }
 
   const trip = {
     destination: 'New Zealand',

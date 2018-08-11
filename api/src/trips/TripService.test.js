@@ -344,7 +344,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await trips.forEach(async t => t.save());
+      await Promise.all(trips.map(t => t.save()));
 
       const { service } = await getServiceWithCurrUsr();
 
@@ -391,7 +391,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await trips.forEach(async t => t.save());
+      await Promise.all(trips.map(t => t.save()));
 
       const { service } = await getServiceWithCurrUsr();
 
@@ -438,7 +438,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await trips.forEach(async t => t.save());
+      await Promise.all(trips.map(t => t.save()));
 
       const { service } = await getServiceWithCurrUsr();
 
@@ -448,6 +448,127 @@ describe('The TripService', () => {
       expect(result.trips[0].id).toEqual(trips[2].id);
       expect(result.trips[1].id).toEqual(trips[1].id);
       expect(result.trips[2].id).toEqual(trips[0].id);
+    });
+  });
+
+  describe('when getting the travel plan', () => {
+    it('should get the trips of the current month if no options are passed', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
+      const baseDate = moment().startOf('day');
+
+      const trips = [];
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(-10, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(-5, 'days')
+            .toDate(),
+        }),
+      );
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(1, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(1, 'days')
+            .toDate(),
+        }),
+      );
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(1, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(1, 'days')
+            .toDate(),
+        }),
+      );
+
+      await Promise.all(trips.map(t => t.save()));
+
+      const result = await service.getTravelPlan();
+
+      expect(result.length).toBe(2);
+    });
+
+    it('should get the trips of the month acordingly the options', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
+      const baseDate = moment()
+        .endOf('month')
+        .add(2, 'days')
+        .startOf('month');
+
+      const trips = [];
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(-10, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(-5, 'days')
+            .toDate(),
+        }),
+      );
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(2, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(5, 'days')
+            .toDate(),
+        }),
+      );
+
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(baseDate)
+            .add(10, 'days')
+            .toDate(),
+          endDate: moment(baseDate)
+            .add(15, 'days')
+            .toDate(),
+        }),
+      );
+
+      await Promise.all(trips.map(t => t.save()));
+
+      const result = await service.getTravelPlan({ month: baseDate.month() + 1, year: baseDate.year() });
+
+      expect(result.length).toBe(2);
+    });
+
+    it('should throw BadRequest if the month is invalid', async () => {
+      const { service } = await getServiceWithCurrUsr();
+
+      const getTravelPlan = service.getTravelPlan({ month: 'january' });
+
+      await expect(getTravelPlan).rejects.toThrow(BadRequest);
+    });
+
+    it('should throw BadRequest if the year is invalid', async () => {
+      const { service } = await getServiceWithCurrUsr();
+
+      const getTravelPlan = service.getTravelPlan({ year: 2000 });
+
+      await expect(getTravelPlan).rejects.toThrow(BadRequest);
     });
   });
 });

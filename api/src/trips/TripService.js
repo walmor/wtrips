@@ -93,13 +93,33 @@ class TripService {
     return { totalCount, trips };
   }
 
+  async getTravelPlan(options) {
+    await this.ensureAuthorized('list');
+
+    const userId = this.currUser.id;
+
+    const baseDate = this.getTravelPlanBaseDate(options);
+    const startDate = baseDate.toDate();
+    const endDate = baseDate.endOf('month').toDate();
+
+    const conditions = {
+      $and: [{ userId }, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
+    };
+
+    const tripModels = await Trip.find(conditions, null, {
+      sort: { startDate: 1 },
+    });
+
+    return tripModels.map(t => t.toObject());
+  }
+
   sanitizeListOpts(options) {
     const opts = options || {};
     const search = opts.search || null;
 
     let startDate = moment(opts.startDate || null);
     let endDate = moment(opts.endDate || null);
-    const sort = opts.sort || 'createdAt:desc';
+    const sort = opts.sort || 'startDate:asc';
 
     let page = parseInt(opts.page, 10);
     let pageSize = parseInt(opts.pageSize, 10);
@@ -112,7 +132,7 @@ class TripService {
     let [sortField, sortOrder] = sort.split(':');
 
     if (Trip.schema.pathType(sortField) === 'adhocOrUndefined') {
-      sortField = 'createdAt';
+      sortField = 'startDate';
     }
 
     sortOrder = sortOrder === 'desc' ? -1 : 1;
@@ -133,6 +153,36 @@ class TripService {
       sortOrder,
       userId,
     };
+  }
+
+  getTravelPlanBaseDate(options) {
+    const opts = options || {};
+
+    const currMonth = moment().month() + 1;
+    const currYear = moment().year();
+
+    const month = parseInt(opts.month || currMonth, 10);
+    const year = parseInt(opts.year || currYear, 10);
+
+    if (!Number.isInteger(month) || month < 1 || month > 12) {
+      throw new BadRequest('bad-request', 'The month should be a number between 1 and 12.');
+    }
+
+    if (!Number.isInteger(year) || year < currYear) {
+      throw new BadRequest('bad-request', 'The year should be a number greater than or equal to the current year.');
+    }
+
+    if (year === currYear && month === currMonth) {
+      return moment().startOf('day');
+    }
+
+    const baseDate = moment(new Date(year, month - 1, 1));
+
+    if (baseDate.isBefore(moment())) {
+      throw new BadRequest('bad-request', 'The filter date should be greater than the current date.');
+    }
+
+    return baseDate;
   }
 
   async saveTrip(trip) {
