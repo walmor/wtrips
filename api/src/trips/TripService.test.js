@@ -238,16 +238,26 @@ describe('The TripService', () => {
       expect(result.trips.length).toBe(20);
     });
 
-    it('should return the first 20 trips if options invalid', async () => {
+    it('should throw BadRequest if options are invalid', async () => {
       const qty = 24;
       await createTrips(qty);
 
       const { service } = await getServiceWithCurrUsr();
 
-      const result = await service.list({ page: 'invalid', pageSize: 'NaN' });
+      let list = service.list({ page: 'NaN' });
+      await expect(list).rejects.toThrow();
 
-      expect(result.totalCount).toBe(qty);
-      expect(result.trips.length).toBe(20);
+      list = service.list({ pageSize: -1 });
+      await expect(list).rejects.toThrow();
+
+      list = service.list({ startDate: 'invalid-date' });
+      await expect(list).rejects.toThrow();
+
+      list = service.list({ endDate: 'invalid-date' });
+      await expect(list).rejects.toThrow();
+
+      list = service.list({ sort: 'unknown-field' });
+      await expect(list).rejects.toThrow();
     });
 
     it('should return the number of trips acordingly the page size', async () => {

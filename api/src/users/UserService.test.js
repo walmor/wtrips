@@ -144,16 +144,14 @@ describe('The UserService', () => {
       expect(result.users.length).toBe(20);
     });
 
-    it('should return the first 20 users if options invalid', async () => {
-      const qty = 24;
-      await createUsers(qty);
-
+    it('should throw BadRequest if options are invalid', async () => {
       const { service } = await getServiceWithCurrUsr();
 
-      const result = await service.list({ page: 'invalid', pageSize: 'NaN' });
+      let list = service.list({ page: 'NaN' });
+      await expect(list).rejects.toThrow();
 
-      expect(result.totalCount).toBe(qty + 1);
-      expect(result.users.length).toBe(20);
+      list = service.list({ pageSize: -1 });
+      await expect(list).rejects.toThrow();
     });
 
     it('should return the number of users acordingly the page size', async () => {

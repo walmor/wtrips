@@ -79,10 +79,17 @@ class UserService {
   sanitizeListOpts(options) {
     const opts = options || {};
     const search = opts.search || null;
-    let page = parseInt(opts.page, 10);
-    page = Number.isInteger(page) ? page : 1;
-    let pageSize = parseInt(opts.pageSize, 10);
-    pageSize = Number.isInteger(pageSize) ? pageSize : 20;
+
+    const page = parseInt(opts.page || 1, 10);
+    const pageSize = parseInt(opts.pageSize || 20, 10);
+
+    if (!Number.isInteger(page) || page < 1) {
+      throw new BadRequest('bad-request', 'The page should be a number greater than zero.');
+    }
+
+    if (!Number.isInteger(pageSize) || pageSize < 1) {
+      throw new BadRequest('bad-request', 'The page size should be a number greater than zero.');
+    }
 
     return {
       search,

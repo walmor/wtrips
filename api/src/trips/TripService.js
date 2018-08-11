@@ -117,22 +117,37 @@ class TripService {
     const opts = options || {};
     const search = opts.search || null;
 
-    let startDate = moment(opts.startDate || null);
-    let endDate = moment(opts.endDate || null);
+    const page = parseInt(opts.page || 1, 10);
+    const pageSize = parseInt(opts.pageSize || 20, 10);
+
+    const startDate = opts.startDate ? moment(opts.startDate) : null;
+    const endDate = opts.endDate ? moment(opts.endDate) : null;
     const sort = opts.sort || 'startDate:asc';
 
-    let page = parseInt(opts.page, 10);
-    let pageSize = parseInt(opts.pageSize, 10);
+    if (!Number.isInteger(page) || page < 1) {
+      throw new BadRequest('bad-request', 'The page should be a number greater than zero.');
+    }
 
-    page = Number.isInteger(page) ? page : 1;
-    pageSize = Number.isInteger(pageSize) ? pageSize : 20;
-    startDate = startDate.isValid() ? startDate.toDate() : null;
-    endDate = endDate.isValid() ? endDate.toDate() : null;
+    if (!Number.isInteger(pageSize) || pageSize < 1) {
+      throw new BadRequest('bad-request', 'The page size should be a number greater than zero.');
+    }
+
+    if (startDate && !startDate.isValid()) {
+      throw new BadRequest('bad-request', 'The start date filter must be a valid date.');
+    }
+
+    if (endDate && !endDate.isValid()) {
+      throw new BadRequest('bad-request', 'The end date filter must be a valid date.');
+    }
+
+    if (startDate && endDate && endDate.isBefore(startDate)) {
+      throw new BadRequest('bad-request', 'The end date should be greater than or equal to the start date.');
+    }
 
     let [sortField, sortOrder] = sort.split(':');
 
     if (Trip.schema.pathType(sortField) === 'adhocOrUndefined') {
-      sortField = 'startDate';
+      throw new BadRequest('bad-request', 'The sort field is invalid.');
     }
 
     sortOrder = sortOrder === 'desc' ? -1 : 1;
