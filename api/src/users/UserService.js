@@ -26,25 +26,18 @@ class UserService {
 
     user.set(userData);
 
-    if (user.isModified('email')) {
-      const exists = await User.count({ email: user.email });
-
-      if (exists) {
-        throw new BadRequest('bad-request', `The email ${user.email} is already in use by another account.`);
+    try {
+      await user.save();
+      return user.toObject();
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        const badRequest = new BadRequest('bad-request', 'User validation failed.');
+        badRequest.errors = formatMongooseError(err);
+        throw badRequest;
       }
+
+      throw err;
     }
-
-    const error = user.validateSync();
-
-    if (error) {
-      const badRequest = new BadRequest('bad-request', 'User validation failed.');
-      badRequest.errors = formatMongooseError(error);
-      throw badRequest;
-    }
-
-    await user.save();
-
-    return user.toObject();
   }
 
   async get(id) {

@@ -103,7 +103,7 @@ describe('The UserService', () => {
       expect.assertions(2);
 
       try {
-        await service.update(currUser.id, { name: null });
+        await service.update(currUser.id, { email: 'invalid-email' });
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequest);
         expect(error.errors).toBeDefined();

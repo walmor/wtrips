@@ -49,9 +49,8 @@ describe('The user', async () => {
     try {
       await user2.save();
     } catch (error) {
-      const duplicateKeyErrorCode = 11000;
-      expect(error.code).toBe(duplicateKeyErrorCode);
-      expect(error.message).toContain(email);
+      expect(error.errors.email).toBeDefined();
+      expect(error.errors.email.kind).toBe('user defined');
     }
   });
 
