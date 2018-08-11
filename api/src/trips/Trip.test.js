@@ -38,7 +38,7 @@ describe('The trip', () => {
   });
 
   it('should not be saved if it is not assign to an user', async () => {
-    await testTripRequiredProperty('userId');
+    await testTripRequiredProperty('user');
   });
 
   it('should not have its creation date updated', async () => {

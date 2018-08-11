@@ -5,7 +5,7 @@ const tripSchema = new Schema({
   destination: { type: String, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
   comment: String,
   createdAt: {
     type: Date,

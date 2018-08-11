@@ -13,7 +13,7 @@ class TripService {
   async create(tripData) {
     await this.ensureAuthorized('create');
 
-    tripData.userId = tripData.userId || this.currUser.id;
+    tripData.user = tripData.userId || this.currUser.id;
 
     const now = new Date();
     const dates = { createdAt: now, updatedAt: now };
@@ -28,7 +28,7 @@ class TripService {
 
     await this.ensureAuthorized('update', trip);
 
-    if (tripData.userId !== undefined && tripData.userId !== trip.userId) {
+    if (tripData.userId !== undefined && !trip.user._id.equals(tripData.userId)) {
       throw new BadRequest('The trip user cannot be changed.');
     }
 
@@ -52,7 +52,7 @@ class TripService {
 
     const skip = (opts.page - 1) * opts.pageSize;
 
-    let conditions = opts.userId ? { userId: opts.userId } : {};
+    let conditions = opts.userId ? { user: opts.userId } : {};
 
     if (opts.search) {
       const regex = new RegExp(opts.search, 'i');
@@ -86,7 +86,9 @@ class TripService {
       skip,
       limit: opts.pageSize,
       sort: { [opts.sortField]: opts.sortOrder },
-    });
+    })
+      .populate('user', '_id name')
+      .exec();
 
     const trips = tripModels.map(t => t.toObject());
 
@@ -96,14 +98,14 @@ class TripService {
   async getTravelPlan(options) {
     await this.ensureAuthorized('list');
 
-    const userId = this.currUser.id;
+    const user = this.currUser.id;
 
     const baseDate = this.getTravelPlanBaseDate(options);
     const startDate = baseDate.toDate();
     const endDate = baseDate.endOf('month').toDate();
 
     const conditions = {
-      $and: [{ userId }, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
+      $and: [{ user }, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
     };
 
     const tripModels = await Trip.find(conditions, null, {

@@ -49,7 +49,7 @@ async function createTrip(props) {
     comment: 'This is going to be an awesome trip.',
     createdAt: new Date(),
     updatedAt: new Date(),
-    userId: user.id,
+    user: user.id,
   };
 
   return new Trip(Object.assign(trip, props));

@@ -23,7 +23,7 @@ acl.allow('user', 'trip', ['create', 'list']);
 acl.allow('user', 'trip', ['edit', 'update', 'delete'], (err, role, resource, action, result, next) => {
   if (!(role instanceof User) || !(resource instanceof Trip)) return next();
 
-  if (role._id.equals(resource.userId)) {
+  if (role._id.equals(resource.user._id)) {
     return result(null, true);
   }
 

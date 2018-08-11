@@ -105,7 +105,7 @@ describe('The TripService', () => {
   describe('when getting a trip by id', () => {
     it('should get an existing trip', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
-      const trip = await createTrip({ userId: currUser.id });
+      const trip = await createTrip({ user: currUser });
       await trip.save();
 
       const foundTrip = await service.get(trip.id);
@@ -144,7 +144,7 @@ describe('The TripService', () => {
     it('should ensure the user is authorized ', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const trip = await createTrip({ userId: currUser.id });
+      const trip = await createTrip({ user: currUser });
       await trip.save();
 
       await service.update(trip.id, {});
@@ -155,7 +155,7 @@ describe('The TripService', () => {
     it('should throw BadRequest if the trip data is invalid', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const trip = await createTrip({ userId: currUser.id });
+      const trip = await createTrip({ user: currUser });
       await trip.save();
 
       expect.assertions(2);
@@ -206,7 +206,7 @@ describe('The TripService', () => {
 
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const trip = await createTrip({ userId: currUser.id });
+      const trip = await createTrip({ user: currUser });
       await trip.save();
 
       const updatedTrip = await service.update(trip.id, tripData);
@@ -458,6 +458,18 @@ describe('The TripService', () => {
       expect(result.trips[0].id).toEqual(trips[2].id);
       expect(result.trips[1].id).toEqual(trips[1].id);
       expect(result.trips[2].id).toEqual(trips[0].id);
+    });
+
+    it('should return the user id and name', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
+      const trip = await createTrip({ user: currUser });
+      await trip.save();
+
+      const result = await service.list();
+
+      expect(result.trips[0].user.name).toBe(currUser.name);
+      expect(result.trips[0].user._id.equals(currUser._id)).toBe(true);
     });
   });
 

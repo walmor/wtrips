@@ -78,7 +78,7 @@ describe('The manager user', async () => {
     const mng = await manager();
     await mng.save();
 
-    const trip = await createTrip({ userId: mng.id });
+    const trip = await createTrip({ user: mng });
 
     await expect(ensureAuthorized(mng, trip, 'edit')).resolves.not.toThrow();
   });
@@ -87,7 +87,7 @@ describe('The manager user', async () => {
     const mng = await manager();
     await mng.save();
 
-    const trip = await createTrip({ userId: mng.id });
+    const trip = await createTrip({ user: mng });
 
     await expect(ensureAuthorized(mng, trip, 'update')).resolves.not.toThrow();
   });
@@ -96,7 +96,7 @@ describe('The manager user', async () => {
     const mng = await manager();
     await mng.save();
 
-    const trip = await createTrip({ userId: mng.id });
+    const trip = await createTrip({ user: mng });
 
     await expect(ensureAuthorized(mng, trip, 'delete')).resolves.not.toThrow();
   });
@@ -141,7 +141,7 @@ describe('The regular user', async () => {
     const usr = await user();
     await usr.save();
 
-    const trip = await createTrip({ userId: usr.id });
+    const trip = await createTrip({ user: usr });
 
     await expect(ensureAuthorized(usr, trip, 'edit')).resolves.not.toThrow();
   });
@@ -150,7 +150,7 @@ describe('The regular user', async () => {
     const usr = await user();
     await usr.save();
 
-    const trip = await createTrip({ userId: usr.id });
+    const trip = await createTrip({ user: usr });
 
     await expect(ensureAuthorized(usr, trip, 'update')).resolves.not.toThrow();
   });
@@ -159,7 +159,7 @@ describe('The regular user', async () => {
     const usr = await user();
     await usr.save();
 
-    const trip = await createTrip({ userId: usr.id });
+    const trip = await createTrip({ user: usr });
 
     await expect(ensureAuthorized(usr, trip, 'delete')).resolves.not.toThrow();
   });
