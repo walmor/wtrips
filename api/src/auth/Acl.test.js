@@ -1,4 +1,4 @@
-import { Forbidden } from 'rest-api-errors';
+import { Forbidden } from 'http-errors';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import ensureAuthorized from './Acl';
 import { createUser, createTrip } from '../__tests__/utils/helpers';

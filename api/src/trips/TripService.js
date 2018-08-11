@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { NotFound, BadRequest } from 'rest-api-errors';
+import { NotFound, BadRequest } from 'http-errors';
 import formatMongooseError from 'mongoose-error-beautifier';
 import ensureAuthorized from '../auth/Acl';
 import Trip from './Trip';
@@ -29,7 +29,7 @@ class TripService {
     await this.ensureAuthorized('update', trip);
 
     if (tripData.userId !== undefined && tripData.userId !== trip.userId) {
-      throw new BadRequest('bad-request', 'The trip user cannot be changed.');
+      throw new BadRequest('The trip user cannot be changed.');
     }
 
     trip.set({ ...tripData, ...{ updatedAt: new Date() } });
@@ -125,29 +125,29 @@ class TripService {
     const sort = opts.sort || 'startDate:asc';
 
     if (!Number.isInteger(page) || page < 1) {
-      throw new BadRequest('bad-request', 'The page should be a number greater than zero.');
+      throw new BadRequest('The page should be a number greater than zero.');
     }
 
     if (!Number.isInteger(pageSize) || pageSize < 1) {
-      throw new BadRequest('bad-request', 'The page size should be a number greater than zero.');
+      throw new BadRequest('The page size should be a number greater than zero.');
     }
 
     if (startDate && !startDate.isValid()) {
-      throw new BadRequest('bad-request', 'The start date filter must be a valid date.');
+      throw new BadRequest('The start date filter must be a valid date.');
     }
 
     if (endDate && !endDate.isValid()) {
-      throw new BadRequest('bad-request', 'The end date filter must be a valid date.');
+      throw new BadRequest('The end date filter must be a valid date.');
     }
 
     if (startDate && endDate && endDate.isBefore(startDate)) {
-      throw new BadRequest('bad-request', 'The end date should be greater than or equal to the start date.');
+      throw new BadRequest('The end date should be greater than or equal to the start date.');
     }
 
     let [sortField, sortOrder] = sort.split(':');
 
     if (Trip.schema.pathType(sortField) === 'adhocOrUndefined') {
-      throw new BadRequest('bad-request', 'The sort field is invalid.');
+      throw new BadRequest('The sort field is invalid.');
     }
 
     sortOrder = sortOrder === 'desc' ? -1 : 1;
@@ -180,11 +180,11 @@ class TripService {
     const year = parseInt(opts.year || currYear, 10);
 
     if (!Number.isInteger(month) || month < 1 || month > 12) {
-      throw new BadRequest('bad-request', 'The month should be a number between 1 and 12.');
+      throw new BadRequest('The month should be a number between 1 and 12.');
     }
 
     if (!Number.isInteger(year) || year < currYear) {
-      throw new BadRequest('bad-request', 'The year should be a number greater than or equal to the current year.');
+      throw new BadRequest('The year should be a number greater than or equal to the current year.');
     }
 
     if (year === currYear && month === currMonth) {
@@ -194,7 +194,7 @@ class TripService {
     const baseDate = moment(new Date(year, month - 1, 1));
 
     if (baseDate.isBefore(moment())) {
-      throw new BadRequest('bad-request', 'The filter date should be greater than the current date.');
+      throw new BadRequest('The filter date should be greater than the current date.');
     }
 
     return baseDate;
@@ -204,13 +204,13 @@ class TripService {
     const error = trip.validateSync();
 
     if (error) {
-      const badRequest = new BadRequest('bad-request', 'Trip validation failed.');
+      const badRequest = new BadRequest('Trip validation failed.');
       badRequest.errors = formatMongooseError(error);
       throw badRequest;
     }
 
     if (moment(trip.endDate).diff(trip.startDate, 'days') < 0) {
-      throw new BadRequest('bad-request', 'The end date should be less than or equal to the start date.');
+      throw new BadRequest('The end date should be less than or equal to the start date.');
     }
 
     await trip.save();
@@ -219,7 +219,7 @@ class TripService {
   }
 
   async ensureTripExists(id) {
-    const notFound = new NotFound('not-found', 'Trip not found.');
+    const notFound = new NotFound('Trip not found.');
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw notFound;

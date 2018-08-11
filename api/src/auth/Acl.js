@@ -1,6 +1,6 @@
 import { Acl } from 'virgen-acl';
 import { promisify } from 'util';
-import { Forbidden } from 'rest-api-errors';
+import { Forbidden } from 'http-errors';
 import User from '../users/User';
 import Trip from '../trips/Trip';
 
@@ -45,7 +45,7 @@ async function ensureAuthorized(user, resource, action) {
   const authorized = await query(user, resource, action);
 
   if (!authorized) {
-    throw new Forbidden();
+    throw new Forbidden('Access denied');
   }
 }
 

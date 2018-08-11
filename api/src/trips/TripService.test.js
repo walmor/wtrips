@@ -1,4 +1,4 @@
-import { NotFound, BadRequest } from 'rest-api-errors';
+import { NotFound, BadRequest } from 'http-errors';
 import moment from 'moment';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import { createUser, createTrip, createTrips } from '../__tests__/utils/helpers';

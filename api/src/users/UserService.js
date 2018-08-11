@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { NotFound, Forbidden, BadRequest } from 'rest-api-errors';
+import { NotFound, Forbidden, BadRequest } from 'http-errors';
 import formatMongooseError from 'mongoose-error-beautifier';
 import ensureAuthorized from '../auth/Acl';
 import User from './User';
@@ -16,11 +16,11 @@ class UserService {
 
     if (user._id.equals(this.currUser.id)) {
       if (userData.role !== undefined && userData.role !== this.currUser.role) {
-        throw new Forbidden('forbidden', 'The user cannot change his own role.');
+        throw new Forbidden('The user cannot change his own role.');
       }
 
       if (userData.isActive !== undefined && userData.isActive !== this.currUser.isActive) {
-        throw new Forbidden('forbidden', 'The user cannot change his own state.');
+        throw new Forbidden('The user cannot change his own state.');
       }
     }
 
@@ -31,7 +31,7 @@ class UserService {
       return user.toObject();
     } catch (err) {
       if (err.name === 'ValidationError') {
-        const badRequest = new BadRequest('bad-request', 'User validation failed.');
+        const badRequest = new BadRequest('User validation failed.');
         badRequest.errors = formatMongooseError(err);
         throw badRequest;
       }
@@ -77,11 +77,11 @@ class UserService {
     const pageSize = parseInt(opts.pageSize || 20, 10);
 
     if (!Number.isInteger(page) || page < 1) {
-      throw new BadRequest('bad-request', 'The page should be a number greater than zero.');
+      throw new BadRequest('The page should be a number greater than zero.');
     }
 
     if (!Number.isInteger(pageSize) || pageSize < 1) {
-      throw new BadRequest('bad-request', 'The page size should be a number greater than zero.');
+      throw new BadRequest('The page size should be a number greater than zero.');
     }
 
     return {
@@ -92,7 +92,7 @@ class UserService {
   }
 
   async ensureUserExists(id) {
-    const notFound = new NotFound('not-found', 'User not found.');
+    const notFound = new NotFound('User not found.');
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw notFound;

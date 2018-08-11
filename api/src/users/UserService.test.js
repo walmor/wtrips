@@ -1,4 +1,4 @@
-import { Forbidden, NotFound, BadRequest } from 'rest-api-errors';
+import { Forbidden, NotFound, BadRequest } from 'http-errors';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import * as acl from '../auth/Acl';
 import { createUser, createUsers } from '../__tests__/utils/helpers';
