@@ -62,7 +62,7 @@ class UserService {
       conditions = { $or: [{ name: regex }, { email: regex }] };
     }
 
-    const totalCount = await User.count(conditions);
+    const totalCount = await User.countDocuments(conditions);
     const userModels = await User.find(conditions, null, { skip, limit: opts.pageSize, sort: { createdAt: -1 } });
     const users = userModels.map(u => u.toObject());
 
