@@ -35,17 +35,6 @@ describe('The AuthService', () => {
       await expect(signup).rejects.toThrow(BadRequest);
     });
 
-    it('should create a new user if the user data is valid', async () => {
-      const userData = getUserData();
-      const { user } = await service.signup(userData);
-
-      expect(user._id).toBeTruthy();
-      expect(user.name).toEqual(userData.name);
-      expect(user.email).toEqual(userData.email);
-      expect(user.createdAt).toBeInstanceOf(Date);
-      expect(user.createdAt).toEqual(user.updatedAt);
-    });
-
     it('should return a token when signing up successfully', async () => {
       const userData = getUserData();
       const { token } = await service.signup(userData);

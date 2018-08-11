@@ -9,21 +9,24 @@ function createAuthReturn(usr) {
   const token = jwt.sign(
     {
       user: {
-        id: user.id,
+        id: user._id,
         name: user.name,
+        email: user.email,
+        role: user.role,
       },
     },
     config.jwt.secret,
     { expiresIn: config.jwt.expiresIn },
   );
 
-  return { user, token };
+  return { token };
 }
 
 class AuthService {
   async signup(userData) {
     const user = new User(userData);
 
+    user.role = 'user';
     user.createdAt = new Date();
     user.updatedAt = user.createdAt;
 
