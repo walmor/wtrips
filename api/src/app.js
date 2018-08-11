@@ -4,7 +4,7 @@ import jwt from 'express-jwt';
 import 'express-async-errors';
 import errorHandler from 'express-error-handler';
 import config from './config';
-import { setCurrentUser } from './auth/AuthController';
+import setupRequest from './setup';
 import routes from './routes';
 
 const app = express();
@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(jwt({ secret: config.jwt.secret, requestProperty: 'auth' }).unless({ path: [/^\/api\/auth/] }));
 
-app.use(setCurrentUser);
+app.use(setupRequest);
 
 app.use('/api', routes);
 

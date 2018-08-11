@@ -1,13 +1,9 @@
 import express from 'express';
-import AuthService from './AuthService';
-import User from '../users/User';
 
 const router = express.Router();
-const service = new AuthService();
 
 router.post('/signin', async (req, res) => {
-  const result = await service.signin(req.body.email, req.body.password, req.ip);
-  res.json(result);
+  res.json(await req.authService.signin(req.body.email, req.body.password, req.ip));
 });
 
 router.post('/signup', async (req, res) => {
@@ -18,17 +14,7 @@ router.post('/signup', async (req, res) => {
     lastIPAddress: req.ip,
   };
 
-  const result = await service.signup(userData);
-  res.json(result);
+  res.json(await req.authService.signup(userData));
 });
 
-async function setCurrentUser(req, res, next) {
-  if (req.auth && req.auth.user) {
-    const userId = req.auth.user.id;
-    req.user = await User.findById(userId);
-  }
-
-  next();
-}
-
-export { router as default, setCurrentUser };
+export default router;
