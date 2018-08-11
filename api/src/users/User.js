@@ -62,6 +62,18 @@ userSchema.path('email').validate({
   },
 });
 
+userSchema.set('toObject', {
+  versionKey: false,
+  transform(doc, ret) {
+    delete ret.password;
+    delete ret.lastIPAddress;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordExpiresAt;
+
+    return ret;
+  },
+});
+
 userSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     const saltRounds = 9;

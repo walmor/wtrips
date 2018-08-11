@@ -1,6 +1,7 @@
 import { Unauthorized, BadRequest } from 'http-errors';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import { createUser } from '../__tests__/utils/helpers';
+import User from '../users/User';
 import AuthService from './AuthService';
 
 beforeAll(async () => {
@@ -90,9 +91,11 @@ describe('The AuthService', () => {
       const user = await createUser({ password });
       await user.save();
 
-      const signin = await service.signin(user.email, password, ip);
+      await service.signin(user.email, password, ip);
 
-      expect(signin.user.lastIPAddress).toEqual(ip);
+      const savedUser = await User.findById(user.id);
+
+      expect(savedUser.lastIPAddress).toEqual(ip);
     });
 
     it('should return a token when signing in successfully', async () => {
