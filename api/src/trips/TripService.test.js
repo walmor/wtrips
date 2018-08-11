@@ -250,10 +250,10 @@ describe('The TripService', () => {
       list = service.list({ pageSize: -1 });
       await expect(list).rejects.toThrow();
 
-      list = service.list({ startDate: 'invalid-date' });
+      list = service.list({ startDate: moment.invalid() });
       await expect(list).rejects.toThrow();
 
-      list = service.list({ endDate: 'invalid-date' });
+      list = service.list({ endDate: moment.invalid() });
       await expect(list).rejects.toThrow();
 
       list = service.list({ sort: 'unknown-field' });
