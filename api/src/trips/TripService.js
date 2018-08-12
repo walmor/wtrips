@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
 import moment from 'moment';
-import { NotFound, BadRequest } from 'http-errors';
-import formatMongooseError from 'mongoose-error-beautifier';
+import { NotFound, BadRequest, Forbidden } from 'http-errors';
 import ensureAuthorized from '../auth/Acl';
 import Trip from './Trip';
+import User from '../users/User';
+import validateAndSanitizeTripData from './TripSchema';
 
 class TripService {
   constructor(user) {
@@ -13,11 +14,7 @@ class TripService {
   async create(tripData) {
     await this.ensureAuthorized('create');
 
-    tripData.user = tripData.userId || this.currUser.id;
-
-    const trip = new Trip(tripData);
-
-    return this.saveTrip(trip);
+    return this.saveTrip(new Trip(), tripData);
   }
 
   async update(id, tripData) {
@@ -25,13 +22,7 @@ class TripService {
 
     await this.ensureAuthorized('update', trip);
 
-    if (tripData.userId !== undefined && !trip.user._id.equals(tripData.userId)) {
-      throw new BadRequest('The trip user cannot be changed.');
-    }
-
-    trip.set(tripData);
-
-    return this.saveTrip(trip);
+    return this.saveTrip(trip, tripData);
   }
 
   async get(id) {
@@ -200,17 +191,22 @@ class TripService {
     return { userId, baseDate };
   }
 
-  async saveTrip(trip) {
-    const error = trip.validateSync();
+  async saveTrip(trip, tripData) {
+    const data = await validateAndSanitizeTripData(tripData);
 
-    if (error) {
-      const badRequest = new BadRequest('Trip validation failed.');
-      badRequest.errors = formatMongooseError(error);
-      throw badRequest;
-    }
+    trip.set(data);
 
-    if (moment.utc(trip.endDate).diff(trip.startDate, 'days') < 0) {
-      throw new BadRequest('The end date should be less than or equal to the start date.');
+    if (data.userId) {
+      if (this.currUser.role === 'admin') {
+        const user = await User.findById(data.userId);        
+        if (!user) throw new BadRequest('The userId is invalid. User not found.');
+        
+        trip.user = data.userId;
+      } else {
+        throw new Forbidden('Access denied');
+      }
+    } else {
+      trip.user = this.currUser.id;
     }
 
     await trip.save();

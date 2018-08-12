@@ -51,7 +51,7 @@ async function createTrip(props) {
   return new Trip(Object.assign(trip, props));
 }
 
-async function createTrips(qty) {
+async function createTrips(qty, user) {
   const trips = [];
 
   /* eslint-disable no-await-in-loop */
@@ -65,6 +65,7 @@ async function createTrips(qty) {
       destination,
       startDate,
       endDate,
+      user,
     };
 
     const trip = await createTrip(props);

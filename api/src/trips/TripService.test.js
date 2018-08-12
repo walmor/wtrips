@@ -1,4 +1,4 @@
-import { NotFound, BadRequest } from 'http-errors';
+import { NotFound, BadRequest, Forbidden } from 'http-errors';
 import moment from 'moment';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import { createUser, createTrip, createTrips } from '../__tests__/utils/helpers';
@@ -20,7 +20,7 @@ beforeEach(async () => {
 });
 
 async function getServiceWithCurrUsr() {
-  const currUser = await createUser({ role: 'admin' });
+  const currUser = await createUser();
   await currUser.save();
 
   const service = new TripService(currUser);
@@ -100,6 +100,23 @@ describe('The TripService', () => {
 
       expect(acl.default).toHaveBeenCalled();
     });
+
+    it('should not allow a regular user create trip for any other user', async () => {
+      const { service } = await getServiceWithCurrUsr();
+      const user2 = await createUser();
+      await user2.save();
+
+      expect.assertions(1);
+
+      const tripData = getTripData();
+      tripData.userId = user2._id;
+
+      try {
+        await service.create(tripData);
+      } catch (error) {
+        expect(error).toBeInstanceOf(Forbidden);
+      }
+    });
   });
 
   describe('when getting a trip by id', () => {
@@ -158,7 +175,7 @@ describe('The TripService', () => {
       const trip = await createTrip({ user: currUser });
       await trip.save();
 
-      await service.update(trip.id, {});
+      await service.update(trip.id, trip.toObject());
 
       expect(acl.default).toHaveBeenCalled();
     });
@@ -182,25 +199,6 @@ describe('The TripService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(BadRequest);
         expect(error.errors).toBeDefined();
-      }
-    });
-
-    it('should not allow the trip user to be changed', async () => {
-      const { currUser, service } = await getServiceWithCurrUsr();
-
-      const trip = await createTrip();
-      await trip.save();
-
-      expect.assertions(1);
-
-      const tripData = {
-        userId: currUser.id,
-      };
-
-      try {
-        await service.update(trip.id, tripData);
-      } catch (error) {
-        expect(error).toBeInstanceOf(BadRequest);
       }
     });
 
@@ -238,10 +236,10 @@ describe('The TripService', () => {
     });
 
     it('should return the first 20 trips if no options are passed', async () => {
-      const qty = 32;
-      await createTrips(qty);
+      const { currUser, service } = await getServiceWithCurrUsr();
 
-      const { service } = await getServiceWithCurrUsr();
+      const qty = 32;
+      await createTrips(qty, currUser);
 
       const result = await service.list();
 
@@ -250,10 +248,10 @@ describe('The TripService', () => {
     });
 
     it('should throw BadRequest if options are invalid', async () => {
-      const qty = 24;
-      await createTrips(qty);
+      const { currUser, service } = await getServiceWithCurrUsr();
 
-      const { service } = await getServiceWithCurrUsr();
+      const qty = 24;
+      await createTrips(qty, currUser);
 
       let list = service.list({ page: 'NaN' });
       await expect(list).rejects.toThrow();
@@ -272,10 +270,10 @@ describe('The TripService', () => {
     });
 
     it('should return the number of trips acordingly the page size', async () => {
-      const pageSize = 10;
-      await createTrips(12);
+      const { currUser, service } = await getServiceWithCurrUsr();
 
-      const { service } = await getServiceWithCurrUsr();
+      const pageSize = 10;
+      await createTrips(12, currUser);
 
       const result = await service.list({ pageSize });
 
@@ -283,14 +281,14 @@ describe('The TripService', () => {
     });
 
     it('should handle pagination', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
       const qty = 16;
       const pageSize = 10;
       const page = 2;
       const secPageQty = 6;
 
-      await createTrips(qty);
-
-      const { service } = await getServiceWithCurrUsr();
+      await createTrips(qty, currUser);
 
       const result = await service.list({ page, pageSize });
 
@@ -298,14 +296,14 @@ describe('The TripService', () => {
     });
 
     it('should search by destination', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
       const destination = 'UnitTestLand';
 
-      const trip = await createTrip({ destination });
+      const trip = await createTrip({ user: currUser, destination });
       await trip.save();
 
-      await createTrips(10);
-
-      const { service } = await getServiceWithCurrUsr();
+      await createTrips(10, currUser);
 
       const result = await service.list({ search: destination });
 
@@ -313,14 +311,14 @@ describe('The TripService', () => {
     });
 
     it('should search by comment', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
       const comment = 'UnitTest Comment';
 
-      const trip = await createTrip({ comment });
+      const trip = await createTrip({ user: currUser, comment });
       await trip.save();
 
-      await createTrips(10);
-
-      const { service } = await getServiceWithCurrUsr();
+      await createTrips(10, currUser);
 
       const result = await service.list({ search: comment });
 
@@ -328,12 +326,14 @@ describe('The TripService', () => {
     });
 
     it('should filter by start date', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
       const filterDate = moment('2018-08-01');
 
       const trips = [];
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(1, 'days')
             .toDate(),
@@ -345,6 +345,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(-1, 'days')
             .toDate(),
@@ -356,6 +357,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(-10, 'days')
             .toDate(),
@@ -367,20 +369,21 @@ describe('The TripService', () => {
 
       await Promise.all(trips.map(t => t.save()));
 
-      const { service } = await getServiceWithCurrUsr();
-
       const result = await service.list({ startDate: filterDate.toDate() });
 
       expect(result.trips.length).toBe(2);
     });
 
     it('should filter by end date', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
       const filterDate = moment('2018-08-01');
 
       const trips = [];
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(-4, 'days')
             .toDate(),
@@ -392,6 +395,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(-1, 'days')
             .toDate(),
@@ -403,6 +407,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(filterDate)
             .add(1, 'days')
             .toDate(),
@@ -414,20 +419,20 @@ describe('The TripService', () => {
 
       await Promise.all(trips.map(t => t.save()));
 
-      const { service } = await getServiceWithCurrUsr();
-
       const result = await service.list({ endDate: filterDate.toDate() });
 
       expect(result.trips.length).toBe(2);
     });
 
     it('should sort accordingly the options', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
       const baseDate = moment('2018-08-01');
 
       const trips = [];
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(baseDate)
             .add(20, 'days')
             .toDate(),
@@ -439,6 +444,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(baseDate)
             .add(10, 'days')
             .toDate(),
@@ -450,6 +456,7 @@ describe('The TripService', () => {
 
       trips.push(
         await createTrip({
+          user: currUser,
           startDate: moment(baseDate)
             .add(1, 'days')
             .toDate(),
@@ -460,8 +467,6 @@ describe('The TripService', () => {
       );
 
       await Promise.all(trips.map(t => t.save()));
-
-      const { service } = await getServiceWithCurrUsr();
 
       const result = await service.list({ sort: 'startDate:asc' });
 
