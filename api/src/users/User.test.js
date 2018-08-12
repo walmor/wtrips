@@ -58,14 +58,6 @@ describe('The user', async () => {
     await testUserRequiredProperty('password');
   });
 
-  it('should not be saved without a creation date', async () => {
-    await testUserRequiredProperty('createdAt');
-  });
-
-  it('should not be saved without an update date', async () => {
-    await testUserRequiredProperty('updatedAt');
-  });
-
   it('should not be saved without an IP address', async () => {
     await testUserRequiredProperty('lastIPAddress');
   });
@@ -81,6 +73,24 @@ describe('The user', async () => {
       expect(error.errors.lastIPAddress).toBeDefined();
       expect(error.errors.lastIPAddress.kind).toBe('user defined');
     }
+  });
+
+  it('should be saved with a creation and update date', async () => {
+    const user = await createUser();
+    await user.save();
+
+    expect(user.createdAt).toBeTruthy();
+    expect(user.createdAt).toBeInstanceOf(Date);
+    expect(user.updatedAt).toEqual(user.createdAt);
+  });
+
+  it('should have its update date updated', async () => {
+    const user = await createUser();
+    await user.save();
+    const { updatedAt } = user;
+    await user.save();
+
+    expect(user.updatedAt).not.toEqual(updatedAt);
   });
 
   it('should not have its creation date updated', async () => {

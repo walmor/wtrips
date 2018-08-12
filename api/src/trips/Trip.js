@@ -9,12 +9,11 @@ const tripSchema = new Schema({
   comment: String,
   createdAt: {
     type: Date,
-    required: true,
     set(val) {
       return this.createdAt || val;
     },
   },
-  updatedAt: { type: Date, required: true },
+  updatedAt: Date,
 });
 
 tripSchema.virtual('daysLeft').get(function () {
@@ -38,6 +37,18 @@ tripSchema.set('toObject', {
 tripSchema.methods.getResourceId = function () {
   return 'trip';
 };
+
+tripSchema.pre('save', async function (next) {
+  const now = moment.utc().toDate();
+
+  if (this.isNew) {
+    this.createdAt = now;
+  }
+
+  this.updatedAt = now;
+
+  next();
+});
 
 const Trip = mongoose.model('Trip', tripSchema);
 

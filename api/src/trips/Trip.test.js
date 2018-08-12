@@ -29,16 +29,26 @@ describe('The trip', () => {
     await testTripRequiredProperty('endDate');
   });
 
-  it('should not be saved without a creation date', async () => {
-    await testTripRequiredProperty('createdAt');
-  });
-
-  it('should not be saved without an update date', async () => {
-    await testTripRequiredProperty('updatedAt');
-  });
-
   it('should not be saved if it is not assign to an user', async () => {
     await testTripRequiredProperty('user');
+  });
+
+  it('should be saved with a creation and update date', async () => {
+    const trip = await createTrip();
+    await trip.save();
+
+    expect(trip.createdAt).toBeTruthy();
+    expect(trip.createdAt).toBeInstanceOf(Date);
+    expect(trip.updatedAt).toEqual(trip.createdAt);
+  });
+
+  it('should have its update date updated', async () => {
+    const trip = await createTrip();
+    await trip.save();
+    const { updatedAt } = trip;
+    await trip.save();
+
+    expect(trip.updatedAt).not.toEqual(updatedAt);
   });
 
   it('should not have its creation date updated', async () => {

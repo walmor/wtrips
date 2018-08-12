@@ -27,8 +27,6 @@ class AuthService {
     const user = new User(userData);
 
     user.role = 'user';
-    user.createdAt = new Date();
-    user.updatedAt = user.createdAt;
 
     try {
       await user.save();

@@ -9,8 +9,6 @@ async function createUser(props) {
     role: 'user',
     password: '123456',
     isActive: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
     lastIPAddress: '189.100.242.238',
   };
 
@@ -46,9 +44,7 @@ async function createTrip(props) {
     destination: 'New Zealand',
     startDate: new Date('2019-01-01'),
     endDate: new Date('2019-02-01'),
-    comment: 'This is going to be an awesome trip.',
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    comment: 'This is going to be an awesome trip.',    
     user: user.id,
   };
 

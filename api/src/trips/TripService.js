@@ -15,10 +15,7 @@ class TripService {
 
     tripData.user = tripData.userId || this.currUser.id;
 
-    const now = moment.utc().toDate();
-    const dates = { createdAt: now, updatedAt: now };
-
-    const trip = new Trip({ ...tripData, ...dates });
+    const trip = new Trip(tripData);
 
     return this.saveTrip(trip);
   }
@@ -32,8 +29,7 @@ class TripService {
       throw new BadRequest('The trip user cannot be changed.');
     }
 
-    const now = moment.utc().toDate();
-    trip.set({ ...tripData, ...{ updatedAt: now } });
+    trip.set(tripData);
 
     return this.saveTrip(trip);
   }

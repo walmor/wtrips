@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import isEmail from 'validator/lib/isEmail';
 import isIP from 'validator/lib/isIP';
+import moment from 'moment';
 
 const userSchema = new Schema({
   name: { type: String, required: true },
@@ -21,12 +22,11 @@ const userSchema = new Schema({
   isActive: { type: Boolean, default: true },
   createdAt: {
     type: Date,
-    required: true,
     set(val) {
       return this.createdAt || val;
     },
   },
-  updatedAt: { type: Date, required: true },
+  updatedAt: Date,
   lastIPAddress: {
     type: String,
     required: true,
@@ -81,6 +81,14 @@ userSchema.pre('save', async function (next) {
       this.password = await bcrypt.hash(this.password, saltRounds);
     }
   }
+
+  const now = moment.utc().toDate();
+
+  if (this.isNew) {
+    this.createdAt = now;
+  }
+
+  this.updatedAt = now;
 
   next();
 });
