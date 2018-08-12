@@ -121,8 +121,8 @@ class TripService {
     const page = parseInt(opts.page || 1, 10);
     const pageSize = parseInt(opts.pageSize || 20, 10);
 
-    const startDate = opts.startDate ? moment.utc(opts.startDate) : null;
-    const endDate = opts.endDate ? moment.utc(opts.endDate).endOf('day') : null;
+    const startDate = opts.startDate ? moment(opts.startDate) : null;
+    const endDate = opts.endDate ? moment(opts.endDate).endOf('day') : null;
     const sort = opts.sort || 'startDate:asc';
 
     if (!Number.isInteger(page) || page < 1) {
@@ -174,8 +174,8 @@ class TripService {
   getTravelPlanOpts(options) {
     const opts = options || {};
 
-    const currMonth = moment.utc().month() + 1;
-    const currYear = moment.utc().year();
+    const currMonth = moment().month() + 1;
+    const currYear = moment().year();
 
     const month = parseInt(opts.month || currMonth, 10);
     const year = parseInt(opts.year || currYear, 10);
@@ -188,11 +188,11 @@ class TripService {
       throw new BadRequest('The year should be a number greater than or equal to the current year.');
     }
 
-    let baseDate = moment.utc([year, month - 1, 1]);
+    let baseDate = moment([year, month - 1, 1]);
 
     if (year === currYear && month === currMonth) {
-      baseDate = moment.utc().startOf('day');
-    } else if (baseDate.isBefore(moment.utc())) {
+      baseDate = moment().startOf('day');
+    } else if (baseDate.isBefore(moment())) {
       throw new BadRequest('The filter date should be greater than the current date.');
     }
 

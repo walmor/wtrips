@@ -628,8 +628,7 @@ describe('The TripService', () => {
     it('should return the user id and name', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const startDate = moment()
-        .utc()
+      const startDate = moment()        
         .add(2, 'days');
 
       const trip = await createTrip({ startDate, user: currUser });

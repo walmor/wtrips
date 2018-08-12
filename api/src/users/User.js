@@ -59,7 +59,7 @@ userSchema.pre('save', async function (next) {
     }
   }
 
-  const now = moment.utc().toDate();
+  const now = moment().toDate();
 
   if (this.isNew) {
     this.createdAt = now;

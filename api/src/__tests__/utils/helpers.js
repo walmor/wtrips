@@ -57,7 +57,7 @@ async function createTrips(qty, user) {
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < qty; i++) {
     const destination = casual.country;
-    const date = casual.moment.utc().startOf('day');
+    const date = casual.moment.startOf('day');
     const startDate = date.toDate();
     const endDate = date.add(casual.integer(1, 30), 'days').toDate();
 

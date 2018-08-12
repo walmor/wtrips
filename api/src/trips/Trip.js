@@ -17,8 +17,8 @@ const tripSchema = new Schema({
 });
 
 tripSchema.virtual('daysLeft').get(function () {
-  const today = moment.utc().startOf('day');
-  const startDate = moment.utc(this.startDate);
+  const today = moment().startOf('day');
+  const startDate = moment(this.startDate);
 
   const diff = startDate.diff(today, 'days');
 
@@ -39,7 +39,7 @@ tripSchema.methods.getResourceId = function () {
 };
 
 tripSchema.pre('save', async function (next) {
-  const now = moment.utc().toDate();
+  const now = moment().toDate();
 
   if (this.isNew) {
     this.createdAt = now;
