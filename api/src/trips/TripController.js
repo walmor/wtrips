@@ -14,6 +14,10 @@ router.get('/:id', async (req, res) => {
   res.json(await req.tripService.get(req.params.id));
 });
 
+router.delete('/:id', async (req, res) => {
+  res.json(await req.tripService.delete(req.params.id));
+});
+
 router.post('/', async (req, res) => {
   res.json(await req.tripService.create(req.body));
 });

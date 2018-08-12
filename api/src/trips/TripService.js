@@ -25,6 +25,20 @@ class TripService {
     return this.saveTrip(trip, tripData);
   }
 
+  async delete(id) {
+    const trip = await this.ensureTripExists(id);
+
+    await this.ensureAuthorized('delete', trip);
+
+    await Trip.findByIdAndRemove(trip.id);
+
+    return {
+      success: true,
+      message: 'Trip deleted successfully.',
+      tripId: trip._id,
+    };
+  }
+
   async get(id) {
     const trip = await this.ensureTripExists(id);
 
@@ -198,9 +212,9 @@ class TripService {
 
     if (data.userId) {
       if (this.currUser.role === 'admin') {
-        const user = await User.findById(data.userId);        
+        const user = await User.findById(data.userId);
         if (!user) throw new BadRequest('The userId is invalid. User not found.');
-        
+
         trip.user = data.userId;
       } else {
         throw new Forbidden('Access denied');

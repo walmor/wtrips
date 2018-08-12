@@ -226,6 +226,38 @@ describe('The TripService', () => {
     });
   });
 
+  describe('when deleting a trip', () => {
+    it('should throw NotFound if the trip doesnt exist', async () => {
+      const { service } = await getServiceWithCurrUsr();
+
+      const del = service.delete('any-invalid-id');
+
+      await expect(del).rejects.toThrowError(NotFound);
+    });
+
+    it('should ensure the user is authorized ', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
+      const trip = await createTrip({ user: currUser });
+      await trip.save();
+
+      await service.delete(trip.id);
+
+      expect(acl.default).toHaveBeenCalled();
+    });
+
+    it('should delete a trip id it exists and the user has authorization', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+      const trip = await createTrip({ user: currUser });
+      await trip.save();
+
+      const result = await service.delete(trip._id);
+
+      expect(result.success).toBe(true);
+      expect(result.tripId).toEqual(trip._id);
+    });
+  });
+
   describe('when listing trips', () => {
     it('should ensure the user is authorized', async () => {
       const { service } = await getServiceWithCurrUsr();
