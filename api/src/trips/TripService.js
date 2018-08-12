@@ -93,18 +93,18 @@ class TripService {
   async getTravelPlan(options) {
     await this.ensureAuthorized('list');
 
-    const user = this.currUser.id;
-
-    const baseDate = this.getTravelPlanBaseDate(options);
+    const opts = this.getTravelPlanOpts(options);
+    const { baseDate } = opts;
     const startDate = baseDate.toDate();
     const endDate = baseDate.endOf('month').toDate();
 
-    const conditions = {
-      $and: [{ user }, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
+    let conditions = opts.userId ? { user: opts.userId } : {};
+
+    conditions = {
+      $and: [conditions, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
     };
 
-    const opts = { sort: { startDate: 1 } };
-    const tripModels = await Trip.find(conditions, null, opts).populate('user', 'name');
+    const tripModels = await Trip.find(conditions, null, { sort: { startDate: 1 } }).populate('user', 'name');
 
     return tripModels.map(t => t.toObject());
   }
@@ -166,7 +166,7 @@ class TripService {
     };
   }
 
-  getTravelPlanBaseDate(options) {
+  getTravelPlanOpts(options) {
     const opts = options || {};
 
     const currMonth = moment.utc().month() + 1;
@@ -183,17 +183,21 @@ class TripService {
       throw new BadRequest('The year should be a number greater than or equal to the current year.');
     }
 
+    let baseDate = moment.utc([year, month - 1, 1]);
+
     if (year === currYear && month === currMonth) {
-      return moment.utc().startOf('day');
-    }
-
-    const baseDate = moment.utc([year, month - 1, 1]);
-
-    if (baseDate.isBefore(moment.utc())) {
+      baseDate = moment.utc().startOf('day');
+    } else if (baseDate.isBefore(moment.utc())) {
       throw new BadRequest('The filter date should be greater than the current date.');
     }
 
-    return baseDate;
+    let userId = this.currUser.id;
+
+    if (this.currUser.role === 'admin') {
+      userId = opts.userId || null;
+    }
+
+    return { userId, baseDate };
   }
 
   async saveTrip(trip) {
