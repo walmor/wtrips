@@ -455,9 +455,9 @@ describe('The TripService', () => {
       const result = await service.list({ sort: 'startDate:asc' });
 
       expect(result.trips.length).toBe(3);
-      expect(result.trips[0].id).toEqual(trips[2].id);
-      expect(result.trips[1].id).toEqual(trips[1].id);
-      expect(result.trips[2].id).toEqual(trips[0].id);
+      expect(result.trips[0]._id).toEqual(trips[2]._id);
+      expect(result.trips[1]._id).toEqual(trips[1]._id);
+      expect(result.trips[2]._id).toEqual(trips[0]._id);
     });
 
     it('should return the user id and name', async () => {

@@ -238,7 +238,7 @@ class TripService {
   }
 
   async ensureAuthorized(action, resource) {
-    ensureAuthorized(this.currUser, resource || 'trip', action);
+    await ensureAuthorized(this.currUser, resource || 'trip', action);
   }
 }
 
