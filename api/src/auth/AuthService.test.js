@@ -74,6 +74,15 @@ describe('The AuthService', () => {
       await expect(signin).rejects.toThrow(Unauthorized);
     });
 
+    it('should throw Unauthorized if the user is inactive', async () => {
+      const password = '1234';
+      const user = await createUser({ password, isActive: false });
+      await user.save();
+
+      const signin = service.signin(user.email, password, '1.1.1.1');
+      await expect(signin).rejects.toThrow(Unauthorized);
+    });
+
     it('should set the last IP address when signing in successfully', async () => {
       const password = '1234';
       const ip = '1.1.1.1';

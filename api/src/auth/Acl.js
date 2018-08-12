@@ -41,11 +41,17 @@ acl.allow('user', 'user', ['edit', 'update'], (err, role, resource, action, resu
 });
 
 async function ensureAuthorized(user, resource, action) {
+  const forbidden = new Forbidden('Access denied');
+
+  if (!user || !user.isActive) {
+    throw forbidden;
+  }
+
   const query = promisify(acl.query.bind(acl));
   const authorized = await query(user, resource, action);
 
   if (!authorized) {
-    throw new Forbidden('Access denied');
+    throw forbidden;
   }
 }
 

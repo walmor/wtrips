@@ -228,3 +228,16 @@ describe('The regular user', async () => {
     await expect(ensureAuthorized(usr, usr2, 'update')).rejects.toThrow(Forbidden);
   });
 });
+
+describe('An anonymous user', () => {
+  it('should not have access to anything', async () => {
+    await expect(ensureAuthorized(null, 'trip', 'list')).rejects.toThrow(Forbidden);
+  });
+});
+
+describe('An inactive user', () => {
+  it('should not have access to anything', async () => {
+    const user = await createUser({ isActive: false });
+    await expect(ensureAuthorized(user, 'trip', 'list')).rejects.toThrow(Forbidden);
+  });
+});

@@ -12,11 +12,8 @@ async function setCurrentUser(req) {
 
 async function setServices(req) {
   req.authService = new AuthService();
-
-  if (req.user) {
-    req.userService = new UserService(req.user);
-    req.tripService = new TripService(req.user);
-  }
+  req.userService = new UserService(req.user);
+  req.tripService = new TripService(req.user);
 }
 
 async function setupRequest(req, res, next) {

@@ -61,7 +61,7 @@ class AuthService {
 
     const unauthorized = new Unauthorized('Invalid email or password.');
 
-    if (!user) {
+    if (!user || !user.isActive) {
       throw unauthorized;
     }
 
