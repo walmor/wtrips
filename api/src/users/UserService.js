@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import { NotFound, Forbidden, BadRequest } from 'http-errors';
-import formatMongooseError from 'mongoose-error-beautifier';
 import ensureAuthorized from '../auth/Acl';
 import User from './User';
+import validateAndSanitizeUserData from './UserSchema';
 
 class UserService {
   constructor(user) {
@@ -14,30 +14,22 @@ class UserService {
 
     await this.ensureAuthorized('update', user);
 
+    const data = await validateAndSanitizeUserData('update', { _id: user._id, ...userData });
+
     if (user._id.equals(this.currUser.id)) {
-      if (userData.role !== undefined && userData.role !== this.currUser.role) {
+      if (data.role !== undefined && data.role !== this.currUser.role) {
         throw new Forbidden('The user cannot change his own role.');
       }
 
-      if (userData.isActive !== undefined && userData.isActive !== this.currUser.isActive) {
+      if (data.isActive !== undefined && data.isActive !== this.currUser.isActive) {
         throw new Forbidden('The user cannot change his own state.');
       }
     }
 
-    user.set(userData);
+    user.set(data);
 
-    try {
-      await user.save();
-      return user.toObject();
-    } catch (err) {
-      if (err.name === 'ValidationError') {
-        const badRequest = new BadRequest('User validation failed.');
-        badRequest.errors = formatMongooseError(err);
-        throw badRequest;
-      }
-
-      throw err;
-    }
+    await user.save();
+    return user.toObject();
   }
 
   async get(id) {

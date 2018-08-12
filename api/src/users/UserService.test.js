@@ -65,8 +65,9 @@ describe('The UserService', () => {
 
     it('should ensure the user is authorized ', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
+      const userData = { name: 'John', email: 'john@example.com' };
 
-      await service.update(currUser.id, {});
+      await service.update(currUser.id, userData);
 
       expect(acl.default).toHaveBeenCalled();
     });
@@ -74,7 +75,13 @@ describe('The UserService', () => {
     it('should not allow an user to change his own role', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const udpate = service.update(currUser.id, { role: 'admin' });
+      const userData = {
+        name: currUser.name,
+        email: currUser.email,
+        role: 'admin',
+      };
+
+      const udpate = service.update(currUser.id, userData);
 
       await expect(udpate).rejects.toThrowError(Forbidden);
     });
@@ -82,7 +89,13 @@ describe('The UserService', () => {
     it('should not allow an user to change his own state', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const udpate = service.update(currUser.id, { isActive: false });
+      const userData = {
+        name: currUser.name,
+        email: currUser.email,
+        isActive: false,
+      };
+
+      const udpate = service.update(currUser.id, userData);
 
       await expect(udpate).rejects.toThrowError(Forbidden);
     });

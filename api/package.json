@@ -25,7 +25,9 @@
     "mongoose": "^5.2.7",
     "mongoose-error-beautifier": "^1.0.2",
     "validator": "^10.5.0",
-    "virgen-acl": "^0.0.22"
+    "virgen-acl": "^0.0.22",
+    "xss": "^1.0.3",
+    "yup": "^0.26.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

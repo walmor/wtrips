@@ -39,29 +39,6 @@ const userSchema = new Schema({
   resetPasswordExpiresAt: Date,
 });
 
-userSchema.path('email').validate({
-  message: 'This email is already in use by another account.',
-  validator(value) {
-    let where = { email: value };
-
-    if (!this.isNew) {
-      where = {
-        $and: [where, { _id: { $ne: this._id } }],
-      };
-    }
-
-    return new Promise((resolve, reject) => {
-      this.model('User').countDocuments(where, (err, count) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(!count);
-        }
-      });
-    });
-  },
-});
-
 userSchema.set('toObject', {
   versionKey: false,
   transform(doc, ret) {

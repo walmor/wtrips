@@ -7,14 +7,7 @@ router.post('/signin', async (req, res) => {
 });
 
 router.post('/signup', async (req, res) => {
-  const userData = {
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    lastIPAddress: req.ip,
-  };
-
-  res.json(await req.authService.signup(userData));
+  res.json(await req.authService.signup(req.body, req.ip));
 });
 
 export default router;

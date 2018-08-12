@@ -1,4 +1,4 @@
-import { Unauthorized, BadRequest } from 'http-errors';
+import { Unauthorized, BadRequest, InternalServerError } from 'http-errors';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import { createUser } from '../__tests__/utils/helpers';
 import User from '../users/User';
@@ -30,14 +30,21 @@ describe('The AuthService', () => {
 
   describe('when the user is signing up', () => {
     it('should throw BadRequest if the user data is invalid', async () => {
-      const signup = service.signup({ name: null, email: null });
+      const signup = service.signup({ name: null, email: null }, '1.1.1.1');
 
       await expect(signup).rejects.toThrow(BadRequest);
     });
 
+    it('should throw InternalServerError if the user data is invalid', async () => {
+      const userData = getUserData();
+      const signup = service.signup(userData, null);
+
+      await expect(signup).rejects.toThrow(InternalServerError);
+    });
+
     it('should return a token when signing up successfully', async () => {
       const userData = getUserData();
-      const { token } = await service.signup(userData);
+      const { token } = await service.signup(userData, '1.1.1.1');
 
       expect(token).toBeTruthy();
       expect(typeof token).toEqual('string');
@@ -55,9 +62,9 @@ describe('The AuthService', () => {
       await expect(signin).rejects.toThrow(BadRequest);
     });
 
-    it('should throw BadRequest if the IP address is not passed', async () => {
+    it('should throw InternalServerError if the IP address is not passed', async () => {
       const signin = service.signin('test@example.com', 'pwd', null);
-      await expect(signin).rejects.toThrow(BadRequest);
+      await expect(signin).rejects.toThrow(InternalServerError);
     });
 
     it('should throw Unauthorized if the email does not exist', async () => {

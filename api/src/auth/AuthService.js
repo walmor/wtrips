@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import { Unauthorized, BadRequest } from 'http-errors';
-import formatMongooseError from 'mongoose-error-beautifier';
+import { Unauthorized, BadRequest, InternalServerError } from 'http-errors';
 import User from '../users/User';
 import config from '../config';
+import validateAndSanitizeUserData from '../users/UserSchema';
 
 function createAuthReturn(usr) {
   const user = usr.toObject();
@@ -23,23 +23,18 @@ function createAuthReturn(usr) {
 }
 
 class AuthService {
-  async signup(userData) {
-    const user = new User(userData);
-
-    user.role = 'user';
-
-    try {
-      await user.save();
-      return createAuthReturn(user);
-    } catch (err) {
-      if (err.name === 'ValidationError') {
-        const badRequest = new BadRequest('User validation failed.');
-        badRequest.errors = formatMongooseError(err);
-        throw badRequest;
-      }
-
-      throw err;
+  async signup(userData, ipAddress) {
+    if (!ipAddress) {
+      throw new InternalServerError('The IP address is required.');
     }
+
+    const data = await validateAndSanitizeUserData('create', userData);
+
+    const user = new User(data);
+    user.lastIPAddress = ipAddress;
+
+    await user.save();
+    return createAuthReturn(user);
   }
 
   async signin(email, password, ipAddress) {
@@ -52,7 +47,7 @@ class AuthService {
     }
 
     if (!ipAddress) {
-      throw new BadRequest('The IP address is required.');
+      throw new InternalServerError('The IP address is required.');
     }
 
     const user = await User.findOne({ email });
