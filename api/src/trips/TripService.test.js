@@ -113,6 +113,17 @@ describe('The TripService', () => {
       expect(foundTrip._id.equals(trip.id)).toBe(true);
     });
 
+    it('should return the user id and name', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+      const trip = await createTrip({ user: currUser });
+      await trip.save();
+
+      const foundTrip = await service.get(trip.id);
+
+      expect(foundTrip.user._id.equals(currUser._id)).toBe(true);
+      expect(foundTrip.user.name).toEqual(currUser.name);
+    });
+
     it('should throw NotFound if the trip doesnt exist', async () => {
       const { service } = await getServiceWithCurrUsr();
 
@@ -575,6 +586,22 @@ describe('The TripService', () => {
       const result = await service.getTravelPlan({ month: baseDate.month() + 1, year: baseDate.year() });
 
       expect(result.length).toBe(2);
+    });
+
+    it('should return the user id and name', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr();
+
+      const startDate = moment()
+        .utc()
+        .add(2, 'days');
+
+      const trip = await createTrip({ startDate, user: currUser });
+      await trip.save();
+
+      const trips = await service.getTravelPlan();
+
+      expect(trips[0].user.name).toBe(currUser.name);
+      expect(trips[0].user._id.equals(currUser._id)).toBe(true);
     });
 
     it('should throw BadRequest if the month is invalid', async () => {

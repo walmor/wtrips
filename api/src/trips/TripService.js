@@ -83,9 +83,7 @@ class TripService {
       skip,
       limit: opts.pageSize,
       sort: { [opts.sortField]: opts.sortOrder },
-    })
-      .populate('user', '_id name')
-      .exec();
+    }).populate('user', 'name');
 
     const trips = tripModels.map(t => t.toObject());
 
@@ -105,9 +103,8 @@ class TripService {
       $and: [{ user }, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
     };
 
-    const tripModels = await Trip.find(conditions, null, {
-      sort: { startDate: 1 },
-    });
+    const opts = { sort: { startDate: 1 } };
+    const tripModels = await Trip.find(conditions, null, opts).populate('user', 'name');
 
     return tripModels.map(t => t.toObject());
   }
@@ -224,7 +221,7 @@ class TripService {
       throw notFound;
     }
 
-    const trip = await Trip.findById(id);
+    const trip = await Trip.findById(id).populate('user', 'name');
 
     if (!trip) {
       throw notFound;
