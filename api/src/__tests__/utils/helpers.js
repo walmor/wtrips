@@ -1,4 +1,5 @@
 import casual from 'casual';
+import moment from 'moment';
 import User from '../../users/User';
 import Trip from '../../trips/Trip';
 
@@ -57,7 +58,7 @@ async function createTrips(qty, user) {
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < qty; i++) {
     const destination = casual.country;
-    const date = casual.moment.startOf('day');
+    const date = moment().startOf('day').add(casual.integer(-60, 200), 'days');
     const startDate = date.toDate();
     const endDate = date.add(casual.integer(1, 30), 'days').toDate();
 
