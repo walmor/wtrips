@@ -1,0 +1,22 @@
+.SiderHeader {
+  background: #002140;
+  display: flex;
+  height: $header-height;
+  line-height: $header-height;
+  overflow: hidden;
+  padding: 0 24px;
+
+  img {
+    flex: 0 0;
+    padding-right: 24px;
+  }
+
+  h1 {
+    color: #fff;
+    flex: auto;
+    font-size: 1.7em;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+  }
+}

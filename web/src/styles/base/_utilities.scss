@@ -1,0 +1,40 @@
+.u-marginBottom {
+  margin-bottom: 1rem !important;
+}
+
+.u-marginRight {
+  margin-right: 1rem !important;
+}
+
+.u-sizeFill {
+  width: 100% !important;
+}
+
+.u-containerPadding {
+  padding: 1.5rem !important;
+}
+
+.u-borderBox {
+  box-sizing: border-box !important;
+}
+
+.u-posAbsolute {
+  left: 0;
+  position: absolute !important;
+  top: 0;
+}
+
+.u-inlineBlock {
+  display: inline-block !important;
+}
+
+.u-floatRight {
+  float: right !important;
+}
+
+.u-clearFix {
+  &::after {
+    clear: both;
+    content: '';
+  }
+}

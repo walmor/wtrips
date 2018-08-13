@@ -1,0 +1,29 @@
+.FlipperContainer {
+  perspective: 1500px;
+}
+
+.Flipper {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: 0.4s;
+
+  &.is-flip {
+    transform: rotateY(180deg);
+  }
+}
+
+.FlipperFace {
+  backface-visibility: hidden;
+  grid-column: 1;
+  grid-row: 1;
+
+  &.is-front {
+    transform: rotateY(0deg);
+    z-index: 2;
+  }
+
+  &.is-back {
+    transform: rotateY(180deg);
+    z-index: 1;
+  }
+}

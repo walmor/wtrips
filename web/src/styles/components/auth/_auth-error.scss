@@ -1,0 +1,10 @@
+.AuthError {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.1s ease;
+
+  &.is-visible {
+    max-height: 80px;
+    transition-duration: 0.3s;
+  }
+}

@@ -1,0 +1,9 @@
+.AdminFooter {
+  height: $footer-height;
+  text-align: center;
+
+  .anticon {
+    color: hsl(0, 0%, 40%);
+    margin: 0 30px;
+  }
+}

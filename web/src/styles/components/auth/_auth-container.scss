@@ -1,0 +1,7 @@
+.AuthContainer {
+  @media (min-width: 500px) {
+    border: 1px solid hsl(0, 0%, 85%);
+    border-radius: 5px;
+    box-shadow: hsl(0, 0%, 80%) 1px 3px 10px;
+  }
+}

@@ -1,0 +1,13 @@
+.LinkButton {
+  background-color: transparent;
+  border: 0;
+  color: #1890ff;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  transition: color 0.3s;
+}
+
+.LinkButton:hover {
+  color: #40a9ff;
+}

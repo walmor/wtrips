@@ -1,0 +1,11 @@
+.ContentPanel {
+  background: hsl(100, 100%, 100%);
+  margin: 24px;
+  min-height: 100%;
+  padding: 24px;
+  position: relative;
+
+  @media (max-width: 575.98px) {
+    margin: 0;
+  }
+}
