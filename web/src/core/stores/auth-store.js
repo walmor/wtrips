@@ -4,8 +4,9 @@ import history from '../history';
 import setErrorMessage from '../get-error-message';
 
 const AUTH_TOKEN_KEY = 'authToken';
-const SIGNIN_ENDPOINT = '/auth/signin';
-const SIGNUP_ENDPOINT = '/auth/signup';
+const SIGNIN_URL = '/auth/signin';
+const SIGNUP_URL = '/auth/signup';
+const EMAIL_AVAILABLE_URL = '/auth/email-available';
 
 class AuthStore {
   @observable
@@ -39,14 +40,14 @@ class AuthStore {
 
   @action
   async signIn(email, password) {
-    this.authenticate(SIGNIN_ENDPOINT, { email, password }, (msg) => {
+    this.authenticate(SIGNIN_URL, { email, password }, (msg) => {
       this.signInError = msg;
     });
   }
 
   @action
   async signUp(name, email, password) {
-    this.authenticate(SIGNUP_ENDPOINT, { name, email, password }, (msg) => {
+    this.authenticate(SIGNUP_URL, { name, email, password }, (msg) => {
       this.signUpError = msg;
     });
   }
@@ -58,6 +59,10 @@ class AuthStore {
     // TODO: create an "event" to allow other stores clean theirs states
 
     this.redirectToSignInPage(error);
+  }
+
+  async isEmailAvailable(email) {
+    return this.api.get(EMAIL_AVAILABLE_URL, { email });
   }
 
   async authenticate(endpoint, data, setError) {

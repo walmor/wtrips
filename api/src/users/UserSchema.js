@@ -22,7 +22,7 @@ const email = yup
   .email()
   .lowercase();
 
-const emailUniqueMessage = 'This email is already in use by another account.';
+const emailUniqueMessage = 'This email is already in use.';
 
 async function isEmailUnique(value, _id) {
   let where = { email: value };

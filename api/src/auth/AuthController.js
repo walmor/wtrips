@@ -10,4 +10,8 @@ router.post('/signup', async (req, res) => {
   res.json(await req.authService.signup(req.body, req.ip));
 });
 
+router.get('/email-available', async (req, res) => {
+  res.json(await req.authService.isEmailAvailable(req.query.email));
+});
+
 export default router;

@@ -12,6 +12,7 @@ const propTypes = {
   error: PropTypes.string,
   loading: PropTypes.bool,
   onSignUp: PropTypes.func.isRequired,
+  isEmailAvailable: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -108,10 +109,9 @@ class SignUpForm extends React.Component {
     try {
       this.setState({ emailValidationError: false });
 
-      // TODO: get data from api
-      const data = { isEmailAvailable: true };
+      const data = await this.props.isEmailAvailable(email);
 
-      if (data.isEmailAvailable) {
+      if (data.isAvailable) {
         callback();
       } else {
         callback('This email is already in use.');
@@ -200,6 +200,7 @@ function mapStateToProps(s) {
   const { auth } = s.appStore;
   return {
     onSignUp: auth.signUp.bind(auth),
+    isEmailAvailable: auth.isEmailAvailable.bind(auth),
     loading: auth.loading,
     error: auth.signUpError,
   };

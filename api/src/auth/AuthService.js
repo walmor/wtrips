@@ -69,6 +69,16 @@ class AuthService {
 
     return createAuthReturn(user);
   }
+
+  async isEmailAvailable(email) {
+    if (!email) {
+      throw new BadRequest('The email is required.');
+    }
+
+    const user = await User.findOne({ email });
+
+    return { email, isAvailable: user === null };
+  }
 }
 
 export default AuthService;
