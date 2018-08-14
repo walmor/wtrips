@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Menu, Icon } from 'antd';
 
-// TODO: inject the currentRoute to get the selectedMenuKey
 const SiderMenu = ({ onMenuItemClick, selectedMenuKey }) => (
   <Menu
     theme="dark"
@@ -12,15 +11,21 @@ const SiderMenu = ({ onMenuItemClick, selectedMenuKey }) => (
     onClick={onMenuItemClick || undefined}
     className="SiderMenu"
   >
-    <Menu.Item key="dashboard">
-      <Link to="/admin/dashboard">
-        <Icon type="dashboard" />
-        <span>Dashboard</span>
+    <Menu.Item key="trips">
+      <Link to="/admin/trips">
+        <Icon type="global" />
+        <span>Trips</span>
+      </Link>
+    </Menu.Item>
+    <Menu.Item key="travelplan">
+      <Link to="/admin/travelplan">
+        <Icon type="calendar" />
+        <span>Travel plan</span>
       </Link>
     </Menu.Item>
     <Menu.Item key="users">
       <Link to="/admin/users">
-        <Icon type="users" />
+        <Icon type="team" />
         <span>Users</span>
       </Link>
     </Menu.Item>

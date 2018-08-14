@@ -16,6 +16,7 @@
     "react/jsx-filename-extension": "off",
     "react/forbid-prop-types": "off",
     "linebreak-style": "off",
-    "jsx-a11y/anchor-is-valid": "off"
+    "jsx-a11y/anchor-is-valid": "off",
+    "class-methods-use-this": "off"
   }
 }

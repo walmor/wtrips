@@ -6,8 +6,9 @@ import AdminHeader from '../components/admin/header/AdminHeader';
 import AdminFooter from '../components/admin/footer/AdminFooter';
 import AdminSider from '../components/admin/sider/AdminSider';
 import ContentHeader from '../components/admin/content/ContentHeader';
-import Dashboard from '../components/admin/Dashboard';
-import { getCurrentRoute } from '../core/routes';
+import Trips from '../components/admin/Trips';
+import TravelPlan from '../components/admin/TravelPlan';
+import Users from '../components/admin/Users';
 
 const { Content } = Layout;
 
@@ -37,7 +38,6 @@ class AdminPage extends React.Component {
 
   render() {
     const { match } = this.props;
-    const route = getCurrentRoute(match.url);
     return (
       <div>
         <Layout>
@@ -48,13 +48,12 @@ class AdminPage extends React.Component {
               collapsed={this.state.menuCollapsed}
             />
             <Content id="content" className="Content">
-              <ContentHeader title="Forms" currentRoute={route} />
+              <ContentHeader title="Trips" />
               <Switch>
-                {/* <Route path={`${match.url}/forms/new`} component={CreateSurveyForm} />
-                <Route path={`${match.url}/forms/:formId`} component={EditSurveyForm} />
-                <Route path={`${match.url}/forms`} component={SurveyForms} /> */}
-                <Route path={`${match.url}/dashboard`} component={Dashboard} />
-                <Redirect to="/admin/dashboard" />
+                <Route path={`${match.url}/users`} component={Users} />
+                <Route path={`${match.url}/travelplan`} component={TravelPlan} />
+                <Route path={`${match.url}/trips`} component={Trips} />
+                <Redirect to={`${match.url}/trips`} />
               </Switch>
             </Content>
             <AdminFooter />

@@ -1,9 +1,9 @@
 import React from 'react';
+import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 
-// TODO: inject the currentRoute
 const ContentHeader = ({ currentRoute }) => (
   <div className="ContentHeader">
     <Breadcrumb>
@@ -21,4 +21,10 @@ ContentHeader.propTypes = {
   currentRoute: PropTypes.object.isRequired,
 };
 
-export default ContentHeader;
+function mapStateToProps(s) {
+  return {
+    currentRoute: s.appStore.currentRoute,
+  };
+}
+
+export default inject(mapStateToProps)(ContentHeader);

@@ -1,17 +1,17 @@
 import React from 'react';
+import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import { Form, Icon, Input, Button, Spin } from 'antd';
 import { FormField, withAntdForm } from '../forms';
 import AuthError from './AuthError';
-import authManager from '../../core/auth-manager';
 import debounce from '../../core/debounce';
 
 const propTypes = {
   resetFocus: PropTypes.bool,
   form: PropTypes.object.isRequired,
-  signUp: PropTypes.func.isRequired,
   error: PropTypes.string,
   loading: PropTypes.bool,
+  onSignUp: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -129,27 +129,9 @@ class SignUpForm extends React.Component {
 
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.signUp(values.signupName, values.signupEmail, values.signupPassword);
+        this.props.onSignUp(values.signupName, values.signupEmail, values.signupPassword);
       }
     });
-  };
-
-  signUp = async (name, email, password) => {
-    try {
-      const { data } = await this.props.signUp({
-        variables: {
-          name,
-          email,
-          password,
-        },
-      });
-
-      const token = data.signup;
-      authManager.signin(token);
-    } catch (err) {
-      // do nothing, because the UI will be updated
-      // through the error property (this.props.error)
-    }
   };
 
   render() {
@@ -214,6 +196,13 @@ class SignUpForm extends React.Component {
 SignUpForm.propTypes = propTypes;
 SignUpForm.defaultProps = defaultProps;
 
-const SignUpAntdForm = withAntdForm(SignUpForm);
+function mapStateToProps(s) {
+  const { auth } = s.appStore;
+  return {
+    onSignUp: auth.signUp.bind(auth),
+    loading: auth.loading,
+    error: auth.signUpError,
+  };
+}
 
-export default SignUpAntdForm;
+export default inject(mapStateToProps)(withAntdForm(SignUpForm));

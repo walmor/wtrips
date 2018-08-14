@@ -1,7 +1,7 @@
 const routes = [
-  createRoute('/admin/users/.+', 'Edit user', 'users'),
   createRoute('/admin/users', 'Users', 'users'),
-  createRoute('/admin/dashboard', 'Dashboard', 'dashboard'),
+  createRoute('/admin/travelplan', 'Travel plan', 'travelplan'),
+  createRoute('/admin/trips', 'Trips', 'trips'),
   createRoute('/admin', 'Home', 'home'),
   createRoute('/signin', 'Sign In', 'signin'),
   createRoute('/signup', 'Sign Up', 'signup'),

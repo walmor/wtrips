@@ -2,13 +2,13 @@ import React from 'react';
 import { Icon } from 'antd';
 import ContentPanel from './content/ContentPanel';
 
-const Dashboard = () => (
+const Users = () => (
   <ContentPanel>
     <div className="Dashboard">
-      <h2>Under construction</h2>
+      <h2>Users</h2>
       <Icon type="exclamation-circle-o" />
     </div>
   </ContentPanel>
 );
 
-export default Dashboard;
+export default Users;

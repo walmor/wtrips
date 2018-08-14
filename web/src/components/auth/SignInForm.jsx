@@ -1,9 +1,9 @@
 import React from 'react';
+import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import { Form, Icon, Input, Button, Spin } from 'antd';
 import { FormField, withAntdForm } from '../forms';
 import AuthError from './AuthError';
-import authManager from '../../core/auth-manager';
 
 const emailOpts = {
   rules: [
@@ -19,9 +19,9 @@ const passwordOpts = {
 const propTypes = {
   resetFocus: PropTypes.bool,
   form: PropTypes.object.isRequired,
-  signIn: PropTypes.func.isRequired,
   error: PropTypes.string,
   loading: PropTypes.bool,
+  onSignIn: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -42,26 +42,9 @@ class SignInForm extends React.Component {
 
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        this.signIn(values.signinEmail, values.signinPassword);
+        this.props.onSignIn(values.signinEmail, values.signinPassword);
       }
     });
-  };
-
-  signIn = async (email, password) => {
-    try {
-      const { data } = await this.props.signIn({
-        variables: {
-          email,
-          password,
-        },
-      });
-
-      const token = data.signin;
-      authManager.signin(token);
-    } catch (err) {
-      // do nothing, because the UI will be updated
-      // through the error property (this.props.error)
-    }
   };
 
   render() {
@@ -107,6 +90,13 @@ class SignInForm extends React.Component {
 SignInForm.propTypes = propTypes;
 SignInForm.defaultProps = defaultProps;
 
-const SignInAntdForm = withAntdForm(SignInForm);
+function mapStateToProps(s) {
+  const { auth } = s.appStore;
+  return {
+    onSignIn: auth.signIn.bind(auth),
+    loading: auth.loading,
+    error: auth.signInError,
+  };
+}
 
-export default SignInAntdForm;
+export default inject(mapStateToProps)(withAntdForm(SignInForm));
