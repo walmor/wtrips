@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Menu, Icon } from 'antd';
 
-const SiderMenu = ({ onMenuItemClick, selectedMenuKey }) => (
+const SiderMenu = ({ onMenuItemClick, selectedMenuKey, canManageUsers }) => (
   <Menu
     theme="dark"
     mode="inline"
@@ -23,23 +23,27 @@ const SiderMenu = ({ onMenuItemClick, selectedMenuKey }) => (
         <span>Travel plan</span>
       </Link>
     </Menu.Item>
-    <Menu.Item key="users">
-      <Link to="/admin/users">
-        <Icon type="team" />
-        <span>Users</span>
-      </Link>
-    </Menu.Item>
+    {canManageUsers && (
+      <Menu.Item key="users">
+        <Link to="/admin/users">
+          <Icon type="team" />
+          <span>Users</span>
+        </Link>
+      </Menu.Item>
+    )}
   </Menu>
 );
 
 SiderMenu.propTypes = {
   onMenuItemClick: PropTypes.func,
   selectedMenuKey: PropTypes.string,
+  canManageUsers: PropTypes.bool,
 };
 
 SiderMenu.defaultProps = {
   onMenuItemClick: null,
   selectedMenuKey: null,
+  canManageUsers: false,
 };
 
 export default SiderMenu;

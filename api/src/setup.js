@@ -5,13 +5,13 @@ import TripService from './trips/TripService';
 
 async function setCurrentUser(req) {
   if (req.auth && req.auth.user) {
-    const userId = req.auth.user.id;
+    const userId = req.auth.user._id;
     req.user = await User.findById(userId);
   }
 }
 
 async function setServices(req) {
-  req.authService = new AuthService();
+  req.authService = new AuthService(req.user);
   req.userService = new UserService(req.user);
   req.tripService = new TripService(req.user);
 }

@@ -9,7 +9,7 @@ function createAuthReturn(usr) {
   const token = jwt.sign(
     {
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -23,6 +23,10 @@ function createAuthReturn(usr) {
 }
 
 class AuthService {
+  constructor(currUser) {
+    this.currUser = currUser;
+  }
+
   async signup(userData, ipAddress) {
     if (!ipAddress) {
       throw new InternalServerError('The IP address is required.');
@@ -78,6 +82,10 @@ class AuthService {
     const user = await User.findOne({ email });
 
     return { email, isAvailable: user === null };
+  }
+
+  async renewToken() {
+    return createAuthReturn(this.currUser);
   }
 }
 

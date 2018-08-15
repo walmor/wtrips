@@ -13,12 +13,12 @@
 @import 'components/lib/flipper';
 @import 'components/lib/page-spin';
 @import 'components/lib/fixed-action-bar';
+@import 'components/lib/error-message';
 
 // Auth components
 @import 'components/auth/auth-flipper';
 @import 'components/auth/auth-container';
 @import 'components/auth/auth-title';
-@import 'components/auth/auth-error';
 @import 'components/auth/auth-footer';
 
 // Admin components
@@ -33,5 +33,5 @@
 @import 'components/admin/content/content-header';
 @import 'components/admin/content/content-panel';
 @import 'components/admin/dashboard';
-@import 'components/admin/survey-forms';
+@import 'components/admin/user-list';
 @import 'components/admin/survey-form';

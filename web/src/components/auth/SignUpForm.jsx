@@ -3,7 +3,7 @@ import { inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 import { Form, Icon, Input, Button, Spin } from 'antd';
 import { FormField, withAntdForm } from '../forms';
-import AuthError from './AuthError';
+import ErrorMessage from '../lib/ErrorMessage';
 import debounce from '../../core/debounce';
 
 const propTypes = {
@@ -176,7 +176,7 @@ class SignUpForm extends React.Component {
               ref={this.disableCopyPaste}
             />
           </FormField>
-          <AuthError message={this.props.error} />
+          <ErrorMessage message={this.props.error} />
           <Form.Item>
             <Button
               type="primary"

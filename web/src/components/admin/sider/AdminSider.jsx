@@ -14,11 +14,12 @@ const { Sider } = Layout;
 function mapStateToProps(s) {
   return {
     selectedMenuKey: s.appStore.currentRoute.menuKey,
+    canManageUsers: s.appStore.auth.canManageUsers,
   };
 }
 
 const AdminSider = inject(mapStateToProps)(({
-  collapsed, onCollapse, onMenuItemClick, selectedMenuKey,
+  collapsed, onCollapse, onMenuItemClick, selectedMenuKey, canManageUsers,
 }) => (
   <Sider
     trigger={null}
@@ -30,7 +31,11 @@ const AdminSider = inject(mapStateToProps)(({
     className="AdminSider"
   >
     <SiderHeader />
-    <SiderMenu onMenuItemClick={onMenuItemClick} selectedMenuKey={selectedMenuKey} />
+    <SiderMenu
+      onMenuItemClick={onMenuItemClick}
+      selectedMenuKey={selectedMenuKey}
+      canManageUsers={canManageUsers}
+    />
   </Sider>
 ));
 

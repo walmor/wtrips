@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert } from 'antd';
 
-const AuthError = ({ message }) => {
+const ErrorMessage = ({ message }) => {
   const show = !!message;
-  const errorClass = `AuthError ${show ? 'is-visible' : ''}`;
+  const errorClass = `ErrorMessage ${show ? 'is-visible' : ''}`;
 
   return (
     <div className={errorClass}>
@@ -13,12 +13,12 @@ const AuthError = ({ message }) => {
   );
 };
 
-AuthError.propTypes = {
+ErrorMessage.propTypes = {
   message: PropTypes.string,
 };
 
-AuthError.defaultProps = {
+ErrorMessage.defaultProps = {
   message: null,
 };
 
-export default AuthError;
+export default ErrorMessage;

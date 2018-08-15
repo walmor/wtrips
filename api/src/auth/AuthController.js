@@ -14,4 +14,8 @@ router.get('/email-available', async (req, res) => {
   res.json(await req.authService.isEmailAvailable(req.query.email));
 });
 
+router.get('/renew-token', async (req, res) => {
+  res.json(await req.authService.renewToken());
+});
+
 export default router;

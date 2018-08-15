@@ -11,6 +11,7 @@ const sanitize = new xss.FilterXSS({
 
 const name = yup
   .string()
+  .trim()
   .required()
   .min(3)
   .max(50)
@@ -58,6 +59,11 @@ const updateUserSchema = yup.object().shape({
     return isEmailUnique(value, this.parent._id);
   }),
   password,
+  currentPassword: yup.string().when('password', {
+    is: p => !!p,
+    then: password.required('To change the password is required to inform the current one.'),
+    otherwise: yup.string().notRequired(),
+  }),
   role,
   isActive,
 });

@@ -8,7 +8,7 @@ const acl = new Acl();
 
 // Set up roles
 acl.addRole('user');
-acl.addRole('manager', 'user');
+acl.addRole('manager');
 acl.addRole('admin');
 
 // Set up resources
@@ -19,8 +19,8 @@ acl.addResource('user');
 acl.deny();
 acl.allow('admin');
 acl.allow('manager', 'user', ['list', 'edit', 'update']);
-acl.allow('user', 'trip', ['create', 'list']);
-acl.allow('user', 'trip', ['edit', 'update', 'delete'], (err, role, resource, action, result, next) => {
+acl.allow(['manager', 'user'], 'trip', ['create', 'list']);
+acl.allow(['manager', 'user'], 'trip', ['edit', 'update', 'delete'], (err, role, resource, action, result, next) => {
   if (!(role instanceof User) || !(resource instanceof Trip)) return next();
 
   if (role._id.equals(resource.user._id)) {

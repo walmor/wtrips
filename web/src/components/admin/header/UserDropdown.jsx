@@ -5,12 +5,12 @@ import { Avatar, Dropdown, Menu, Icon } from 'antd';
 import MediaQuery from 'react-responsive';
 import bp from '../../../core/mq-breakpoints';
 
-const UserDropdown = ({ onSignOut, username }) => {
+const UserDropdown = ({ onSignOut, editProfile, username }) => {
   const menu = (
     <Menu className="UserDropdownMenu" selectedKeys={[]}>
-      <Menu.Item disabled>
+      <Menu.Item onClick={editProfile}>
         <Icon type="setting" />
-        My account
+        My profile
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="logout" onClick={onSignOut}>
@@ -37,6 +37,7 @@ const UserDropdown = ({ onSignOut, username }) => {
 UserDropdown.propTypes = {
   username: PropTypes.string.isRequired,
   onSignOut: PropTypes.func.isRequired,
+  editProfile: PropTypes.func.isRequired,
 };
 
 function getFirstName(fullname) {
@@ -53,6 +54,7 @@ function mapStateToProps(s) {
   return {
     username: getFirstName(auth.currentUser.name),
     onSignOut: () => auth.signOut(),
+    editProfile: () => auth.editProfile(),
   };
 }
 

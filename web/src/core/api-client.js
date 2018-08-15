@@ -54,7 +54,7 @@ class ApiClient {
 
   setToken(token) {
     axios.defaults.headers.common = {
-      Authentication: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     };
   }
 

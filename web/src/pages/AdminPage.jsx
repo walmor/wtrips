@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout } from 'antd';
+import { observer } from 'mobx-react';
+import { Layout, message } from 'antd';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import AdminHeader from '../components/admin/header/AdminHeader';
 import AdminFooter from '../components/admin/footer/AdminFooter';
@@ -8,12 +9,14 @@ import AdminSider from '../components/admin/sider/AdminSider';
 import ContentHeader from '../components/admin/content/ContentHeader';
 import Trips from '../components/admin/Trips';
 import TravelPlan from '../components/admin/TravelPlan';
-import Users from '../components/admin/Users';
+import UserList from '../components/admin/UserList';
+import UserModal from '../components/admin/UserModal';
 
 const { Content } = Layout;
 
 const propTypes = {
   match: PropTypes.shape({ url: PropTypes.string }).isRequired,
+  location: PropTypes.object.isRequired,
 };
 
 class AdminPage extends React.Component {
@@ -22,6 +25,14 @@ class AdminPage extends React.Component {
     this.state = {
       menuCollapsed: false,
     };
+  }
+
+  componentDidUpdate() {
+    const { location } = this.props;
+    const error = location.state && location.state.error;
+    if (error) {
+      message.error(error);
+    }
   }
 
   onSiderCollapse = (collapsed) => {
@@ -38,6 +49,7 @@ class AdminPage extends React.Component {
 
   render() {
     const { match } = this.props;
+
     return (
       <div>
         <Layout>
@@ -49,8 +61,9 @@ class AdminPage extends React.Component {
             />
             <Content id="content" className="Content">
               <ContentHeader title="Trips" />
+              <UserModal />
               <Switch>
-                <Route path={`${match.url}/users`} component={Users} />
+                <Route path={`${match.url}/users`} component={UserList} />
                 <Route path={`${match.url}/travelplan`} component={TravelPlan} />
                 <Route path={`${match.url}/trips`} component={Trips} />
                 <Redirect to={`${match.url}/trips`} />
@@ -66,4 +79,4 @@ class AdminPage extends React.Component {
 
 AdminPage.propTypes = propTypes;
 
-export default AdminPage;
+export default observer(AdminPage);

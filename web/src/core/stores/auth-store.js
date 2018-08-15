@@ -1,11 +1,12 @@
 import jwt from 'jsonwebtoken';
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import history from '../history';
 import setErrorMessage from '../get-error-message';
 
 const AUTH_TOKEN_KEY = 'authToken';
 const SIGNIN_URL = '/auth/signin';
 const SIGNUP_URL = '/auth/signup';
+const RENEW_TOKEN_URL = '/auth/renew-token';
 const EMAIL_AVAILABLE_URL = '/auth/email-available';
 
 class AuthStore {
@@ -21,7 +22,8 @@ class AuthStore {
   @observable
   signUpError = null;
 
-  constructor(apiClient) {
+  constructor(apiClient, appStore) {
+    this.appStore = appStore;
     this.api = apiClient;
     this.api.onForbidden(err => this.handleForbidden(err));
     this.api.onUnauthorized(err => this.handleUnauthorized(err));
@@ -56,13 +58,25 @@ class AuthStore {
   signOut(error) {
     this.clearToken();
 
-    // TODO: create an "event" to allow other stores clean theirs states
+    this.appStore.clear();
 
     this.redirectToSignInPage(error);
   }
 
+  @action
+  editProfile() {
+    this.appStore.users.editUser(this.currentUser._id);
+  }
+
   async isEmailAvailable(email) {
     return this.api.get(EMAIL_AVAILABLE_URL, { email });
+  }
+
+  @computed
+  get canManageUsers() {
+    if (!this.currentUser) return false;
+    const { role } = this.currentUser;
+    return role === 'manager' || role === 'admin';
   }
 
   async authenticate(endpoint, data, setError) {
@@ -102,6 +116,16 @@ class AuthStore {
     this.redirectToAdminPage('The resource you are trying to access does not exist on the server.');
   }
 
+  async renewToken() {
+    try {
+      const { token } = await this.api.get(RENEW_TOKEN_URL);
+      this.setToken(token);
+    } catch (err) {
+      // In case of error, the user will be
+      // redirected to sign in page on next request.
+    }
+  }
+
   setToken(token) {
     const decoded = jwt.decode(token);
 
@@ -110,7 +134,7 @@ class AuthStore {
       return false;
     }
 
-    this.currentUser = decoded.user;
+    this.currentUser = this.appStore.users.observeUser(decoded.user);
 
     localStorage.setItem(AUTH_TOKEN_KEY, token);
     this.api.setToken(token);

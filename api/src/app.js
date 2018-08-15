@@ -12,7 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(jwt({ secret: config.jwt.secret, requestProperty: 'auth' }).unless({ path: [/^\/api\/auth/] }));
+app.use(jwt({ secret: config.jwt.secret, requestProperty: 'auth' }).unless({ path: [/^\/api\/auth\/(sign|email)/] }));
 
 app.use(setupRequest);
 

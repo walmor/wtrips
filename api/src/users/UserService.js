@@ -24,6 +24,16 @@ class UserService {
       if (data.isActive !== undefined && data.isActive !== this.currUser.isActive) {
         throw new Forbidden('The user cannot change his own state.');
       }
+
+      if (data.password) {
+        const valid = await user.comparePassword(data.currentPassword);
+
+        if (!valid) {
+          throw new BadRequest('The current password is incorrect.');
+        }
+      }
+    } else if (data.password) {
+      throw new Forbidden('Only the user is allowed to changed his password.');
     }
 
     user.set(data);
