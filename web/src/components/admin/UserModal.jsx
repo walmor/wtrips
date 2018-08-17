@@ -8,7 +8,7 @@ import ErrorMessage from '../lib/ErrorMessage';
 
 const { Option } = Select;
 
-class QuestionModal extends React.Component {
+class UserModal extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -229,7 +229,7 @@ class QuestionModal extends React.Component {
   }
 }
 
-QuestionModal.propTypes = {
+UserModal.propTypes = {
   form: PropTypes.object.isRequired,
   visible: PropTypes.bool.isRequired,
   isSaving: PropTypes.bool.isRequired,
@@ -241,7 +241,7 @@ QuestionModal.propTypes = {
   roles: PropTypes.object.isRequired,
 };
 
-QuestionModal.defaultProps = {
+UserModal.defaultProps = {
   error: null,
   user: null,
 };
@@ -260,4 +260,4 @@ function mapStateToProps(s) {
   };
 }
 
-export default inject(mapStateToProps)(observer(withAntdForm(QuestionModal)));
+export default inject(mapStateToProps)(observer(withAntdForm(UserModal)));

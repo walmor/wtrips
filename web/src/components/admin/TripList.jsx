@@ -156,7 +156,7 @@ class TripList extends React.Component {
     return (
       <ContentPanel>
         <TripModal />
-        <div className="UserList">
+        <div>
           <div className="TripSearchPanel">
             <div>
               <Button type="primary" onClick={onCreate}>

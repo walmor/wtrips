@@ -15,6 +15,7 @@
 @import 'components/lib/fixed-action-bar';
 @import 'components/lib/error-message';
 @import 'components/lib/field-label';
+@import 'components/lib/action-icon';
 
 // Auth components
 @import 'components/auth/auth-flipper';
@@ -36,4 +37,4 @@
 @import 'components/admin/dashboard';
 @import 'components/admin/user-list';
 @import 'components/admin/trip-list';
-@import 'components/admin/survey-form';
+@import 'components/admin/travelplan';
