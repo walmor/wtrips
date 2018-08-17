@@ -65,6 +65,8 @@ class TripService {
       conditions = { $and: [conditions, { $or: [{ destination: regex }, { comment: regex }] }] };
     }
 
+    // #region First filter. Get trips that are happening within the filter range. Less intuitive.
+    /*
     if (opts.startDate) {
       conditions = {
         $and: [
@@ -86,6 +88,24 @@ class TripService {
         ],
       };
     }
+    */
+    // #endregion
+
+    // #region Second filter. Get trips that start within the filter range. More intuitive.
+
+    if (opts.startDate) {
+      conditions = {
+        $and: [conditions, { startDate: { $gte: opts.startDate } }],
+      };
+    }
+
+    if (opts.endDate) {
+      conditions = {
+        $and: [conditions, { startDate: { $lte: opts.endDate } }],
+      };
+    }
+
+    // #endregion
 
     const totalCount = await Trip.countDocuments(conditions);
     const tripModels = await Trip.find(conditions, null, {

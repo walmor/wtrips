@@ -374,6 +374,18 @@ describe('The TripService', () => {
             .toDate(),
         }),
       );
+      
+      trips.push(
+        await createTrip({
+          user: currUser,
+          startDate: moment(filterDate)
+            .add(0, 'days')
+            .toDate(),
+          endDate: moment(filterDate)
+            .add(10, 'days')
+            .toDate(),
+        }),
+      );
 
       trips.push(
         await createTrip({
@@ -417,10 +429,10 @@ describe('The TripService', () => {
         await createTrip({
           user: currUser,
           startDate: moment(filterDate)
-            .add(-4, 'days')
+            .add(0, 'days')
             .toDate(),
           endDate: moment(filterDate)
-            .add(-1, 'days')
+            .add(0, 'days')
             .toDate(),
         }),
       );
