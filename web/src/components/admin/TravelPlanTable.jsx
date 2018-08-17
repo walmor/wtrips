@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import { Table } from 'antd';
 import config from '../../core/config';
+import getDaysLeftText from '../../core/get-days-left-text';
 
 function getTableColumns(canManageUserTrips) {
   const columns = [
@@ -35,13 +36,7 @@ function getTableColumns(canManageUserTrips) {
       dataIndex: 'daysLeft',
       key: 'daysLeft',
       width: '15%',
-      render: (text, trip) => {
-        let daysLeft = trip.daysLeft || '';
-        if (daysLeft) {
-          daysLeft += daysLeft === 1 ? ' day' : ' days';
-        }
-        return daysLeft;
-      },
+      render: (text, trip) => getDaysLeftText(trip),
     },
   ];
 

@@ -13,6 +13,7 @@ import EditListActionButton from '../lib/EditListActionButton';
 import DeleteListActionButton from '../lib/DeleteListActionButton';
 import LinkButton from '../lib/LinkButton';
 import ContentPanel from './content/ContentPanel';
+import getDaysLeftText from '../../core/get-days-left-text';
 
 const { Search } = Input;
 const RadioButton = Radio.Button;
@@ -73,13 +74,7 @@ function getTableColumns(smallWidth, onEdit, onDelete, canManageUserTrips) {
       dataIndex: 'daysLeft',
       key: 'daysLeft',
       width: '10%',
-      render: (text, trip) => {
-        let daysLeft = trip.daysLeft || '';
-        if (daysLeft) {
-          daysLeft += daysLeft === 1 ? ' day' : ' days';
-        }
-        return daysLeft;
-      },
+      render: (text, trip) => getDaysLeftText(trip),
     },
   ];
 
