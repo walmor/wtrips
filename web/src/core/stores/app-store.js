@@ -5,6 +5,7 @@ import TripStore from './trip-store';
 import history from '../history';
 import ApiClient from '../api-client';
 import { getCurrentRoute } from '../routes';
+import TravelPlanStore from './travelplan-store';
 
 class AppStore {
   @observable
@@ -15,6 +16,7 @@ class AppStore {
     this.auth = new AuthStore(this.api, this);
     this.users = new UserStore(this.api, this);
     this.trips = new TripStore(this.api, this);
+    this.travelplan = new TravelPlanStore(this.api, this);
 
     history.listen((location) => {
       this.saveCurrentRoute(location);

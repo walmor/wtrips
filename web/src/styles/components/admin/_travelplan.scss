@@ -1,0 +1,38 @@
+.TravelPlanFilterPanel {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+
+  > div {
+    flex: 0 0 auto;
+
+    &:first-child {
+      flex: 1 1 auto;
+      justify-self: flex-start;
+      padding-right: 50px;
+    }
+  }
+}
+
+.TravelPlanMonthFilter {
+  width: 150px;
+}
+
+.TrabelPlanTable {
+  $header-color: #666;
+
+  h1 {
+    border-bottom: 1px solid $header-color;
+    color: $header-color;
+    display: none;
+  }
+
+  @media print {
+    font-size: 0.9em;
+    margin: 2rem;
+
+    h1 {
+      display: block;
+    }
+  }
+}
