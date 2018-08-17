@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Button, Input, Table, Radio, DatePicker, Spin, message, Icon } from 'antd';
 import MediaQuery from 'react-responsive';
 import moment from 'moment';
+import config from '../../core/config';
 import bp from '../../core/mq-breakpoints';
 import UserSelector from './UserSelector';
 import TripModal from './TripModal';
@@ -58,14 +59,14 @@ function getTableColumns(smallWidth, onEdit, onDelete, canManageUserTrips) {
       dataIndex: 'startDate',
       key: 'startDate',
       width: '15%',
-      render: (text, trip) => moment(trip.startDate).format('ll'),
+      render: (text, trip) => moment(trip.startDate).format(config.dateFormat),
     },
     {
       title: 'End date',
       dataIndex: 'endDate',
       key: 'endDate',
       width: '15%',
-      render: (text, trip) => moment(trip.endDate).format('ll'),
+      render: (text, trip) => moment(trip.endDate).format(config.dateFormat),
     },
     {
       title: 'Days left',
@@ -180,12 +181,14 @@ class TripList extends React.Component {
               <DatePicker
                 className="TripListDateFilter"
                 placeholder="From"
+                format={config.dateFormat}
                 value={startDate}
                 onChange={date => this.handleDateFilterChanged('startDate', date)}
               />
               <DatePicker
                 className="TripListDateFilter"
                 placeholder="To"
+                format={config.dateFormat}
                 value={endDate}
                 onChange={date => this.handleDateFilterChanged('endDate', date)}
               />

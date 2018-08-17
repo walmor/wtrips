@@ -4,6 +4,7 @@ import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import { Table } from 'antd';
+import config from '../../core/config';
 
 function getTableColumns(canManageUserTrips) {
   const columns = [
@@ -20,14 +21,14 @@ function getTableColumns(canManageUserTrips) {
       dataIndex: 'startDate',
       key: 'startDate',
       width: '17%',
-      render: (text, trip) => moment(trip.startDate).format('ll'),
+      render: (text, trip) => moment(trip.startDate).format(config.dateFormat),
     },
     {
       title: 'End date',
       dataIndex: 'endDate',
       key: 'endDate',
       width: '17%',
-      render: (text, trip) => moment(trip.endDate).format('ll'),
+      render: (text, trip) => moment(trip.endDate).format(config.dateFormat),
     },
     {
       title: 'Days left',

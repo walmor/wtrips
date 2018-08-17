@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import { Modal, Form, Input, DatePicker, Col, Select, Icon, Row } from 'antd';
 import FormField from '../forms/FormField';
+import config from '../../core/config';
 import { withAntdForm } from '../forms';
 import ErrorMessage from '../lib/ErrorMessage';
 import UserSelector from './UserSelector';
@@ -45,7 +46,7 @@ class TripModal extends React.Component {
 
     const startDate = trip.startDate ? moment(trip.startDate) : undefined;
     const endDate = trip.endDate ? moment(trip.endDate) : undefined;
-    const dates = (startDate && endDate) ? [startDate, endDate] : undefined;
+    const dates = startDate && endDate ? [startDate, endDate] : undefined;
 
     const dateRange = {
       initialValue: dates,
@@ -162,7 +163,7 @@ class TripModal extends React.Component {
             </React.Fragment>
           )}
           <FormField id="dateRange" options={opts.dateRange}>
-            <RangePicker format="ll" className="TripRangePicker" />
+            <RangePicker format={config.dateFormat} className="TripRangePicker" />
           </FormField>
           <FormField id="comment" options={opts.comment}>
             <TextArea placeholder="Comment" autosize={{ minRows: 2, maxRows: 6 }} />
