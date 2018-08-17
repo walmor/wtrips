@@ -64,6 +64,10 @@ class UserService {
       conditions = { $or: [{ name: regex }, { email: regex }] };
     }
 
+    if (opts.isActive !== null) {
+      conditions = { $and: [conditions, { isActive: opts.isActive }] };
+    }
+
     const totalCount = await User.countDocuments(conditions);
     const userModels = await User.find(conditions, null, { skip, limit: opts.pageSize, sort: { createdAt: -1 } });
     const users = userModels.map(u => u.toObject());
@@ -77,6 +81,13 @@ class UserService {
 
     const page = parseInt(opts.page || 1, 10);
     const pageSize = parseInt(opts.pageSize || 20, 10);
+    let isActive = opts.isActive !== undefined ? opts.isActive.toLowerCase() : null;
+
+    if (isActive === '' || isActive === 'true') {
+      isActive = true;
+    } else if (isActive === 'false') {
+      isActive = false;
+    }
 
     if (!Number.isInteger(page) || page < 1) {
       throw new BadRequest('The page should be a number greater than zero.');
@@ -90,6 +101,7 @@ class UserService {
       search,
       page,
       pageSize,
+      isActive,
     };
   }
 

@@ -6,6 +6,8 @@ import Trip from './Trip';
 import User from '../users/User';
 import validateAndSanitizeTripData from './TripSchema';
 
+const BASIC_USER_FIELDS = 'name isActive';
+
 class TripService {
   constructor(user) {
     this.currUser = user;
@@ -43,6 +45,8 @@ class TripService {
     const trip = await this.ensureTripExists(id);
 
     await this.ensureAuthorized('edit', trip);
+
+    await trip.populate({ path: 'user', select: BASIC_USER_FIELDS }).execPopulate();
 
     return trip.toObject();
   }
@@ -88,7 +92,7 @@ class TripService {
       skip,
       limit: opts.pageSize,
       sort: { [opts.sortField]: opts.sortOrder },
-    }).populate('user', 'name');
+    }).populate('user', BASIC_USER_FIELDS);
 
     const trips = tripModels.map(t => t.toObject());
 
@@ -109,7 +113,10 @@ class TripService {
       $and: [conditions, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
     };
 
-    const tripModels = await Trip.find(conditions, null, { sort: { startDate: 1 } }).populate('user', 'name');
+    const tripModels = await Trip.find(conditions, null, { sort: { startDate: 1 } }).populate(
+      'user',
+      BASIC_USER_FIELDS,
+    );
 
     return tripModels.map(t => t.toObject());
   }
@@ -156,6 +163,10 @@ class TripService {
     let userId = this.currUser.id;
 
     if (this.currUser.role === 'admin') {
+      if (opts.userId && !mongoose.Types.ObjectId.isValid(opts.userId)) {
+        throw new BadRequest('Invalid user id.');
+      }
+
       userId = opts.userId || null;
     }
 
@@ -225,6 +236,8 @@ class TripService {
 
     await trip.save();
 
+    await trip.populate({ path: 'user', select: BASIC_USER_FIELDS }).execPopulate();
+
     return trip.toObject();
   }
 
@@ -235,7 +248,7 @@ class TripService {
       throw notFound;
     }
 
-    const trip = await Trip.findById(id).populate('user', 'name');
+    const trip = await Trip.findById(id);
 
     if (!trip) {
       throw notFound;

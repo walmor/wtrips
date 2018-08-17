@@ -79,6 +79,13 @@ class AuthStore {
     return role === 'manager' || role === 'admin';
   }
 
+  @computed
+  get canManageUserTrips() {
+    if (!this.currentUser) return false;
+    const { role } = this.currentUser;
+    return role === 'admin';
+  }
+
   async authenticate(endpoint, data, setError) {
     try {
       this.loading = true;

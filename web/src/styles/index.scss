@@ -14,6 +14,7 @@
 @import 'components/lib/page-spin';
 @import 'components/lib/fixed-action-bar';
 @import 'components/lib/error-message';
+@import 'components/lib/field-label';
 
 // Auth components
 @import 'components/auth/auth-flipper';
@@ -34,4 +35,5 @@
 @import 'components/admin/content/content-panel';
 @import 'components/admin/dashboard';
 @import 'components/admin/user-list';
+@import 'components/admin/trip-list';
 @import 'components/admin/survey-form';

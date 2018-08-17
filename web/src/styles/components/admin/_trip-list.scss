@@ -1,0 +1,36 @@
+.TripSearchPanel {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+
+  > div {
+    flex: 0 0 auto;
+
+    &:first-child {
+      flex: 1 0 auto;
+      justify-self: flex-start;
+      padding-right: 50px;
+    }
+
+    &:last-child {
+      flex: 1 1 auto;
+      max-width: 300px;
+    }
+  }
+}
+
+.TripListUserFilter {
+  // margin-left: 1em;
+  // margin-right: 1em;
+  width: 150px;
+}
+
+.TripListDateFilter {
+  // margin-left: 1em;
+  margin-right: 1em;
+  width: 120px;
+}
+
+.TripRangePicker {
+  width: 100%;
+}

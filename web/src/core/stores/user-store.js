@@ -3,7 +3,7 @@ import queryString from 'query-string';
 import history from '../history';
 import setErrorMessage from '../get-error-message';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 const USERS_URL = '/users/';
 const ROLES = {
   user: 'User',
@@ -37,27 +37,35 @@ export default class UserStore {
     this.appStore = appStore;
     this.api = apiClient;
     this.roles = ROLES;
+    this.loaded = false;
 
     this.init();
+  }
+
+  async load() {
+    if (this.loaded) return;
+    this.loaded = true;
 
     history.listen(async (location) => {
       if (location.pathname.startsWith('/admin/users')) {
-        await this.fetchUsers();
+        await this.loadUsers();
       }
     });
+
+    await this.loadUsers();
   }
 
   @action
-  async fetchUsers() {
+  async loadUsers() {
     try {
       this.updateQueryString();
       this.loading = true;
 
-      const response = await this.api.get(USERS_URL, this.query);
+      const response = await this.fetchUsers(this.query);
 
       this.pagination.total = response.totalCount;
       this.pagination.current = this.query.page;
-      this.users.replace(response.users.map(u => this.observeUser(u)));
+      this.users.replace(response.users);
     } catch (err) {
       setErrorMessage(err, (msg) => {
         this.error = msg;
@@ -95,7 +103,7 @@ export default class UserStore {
       this.userEditing.isSaving = true;
 
       const usr = await this.api.put(USERS_URL + user._id, user);
-      
+
       if (this.userEditing.isCurrentUser) {
         await this.appStore.auth.renewToken();
       }
@@ -158,6 +166,12 @@ export default class UserStore {
     this.init();
   }
 
+  async fetchUsers(query) {
+    const response = await this.api.get(USERS_URL, query);
+    response.users = response.users.map(u => this.observeUser(u));
+    return response;
+  }
+
   observeUser(user) {
     let obsUser = this.allUsers.get(user._id);
 
@@ -181,7 +195,7 @@ export default class UserStore {
     if (!qs.search) {
       qs.search = undefined;
     }
-    
+
     delete qs.pageSize;
 
     const order = ['search', 'page'];

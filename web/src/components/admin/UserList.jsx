@@ -138,7 +138,7 @@ function mapStateToProps(s) {
 
   return {
     searchValue: us.query.search,
-    onLoad: () => us.fetchUsers(),
+    onLoad: () => us.load(),
     onSearch: search => us.search(search),
     onEdit: id => us.editUser(id),
     loading: us.loading,

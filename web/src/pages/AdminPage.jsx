@@ -7,7 +7,7 @@ import AdminHeader from '../components/admin/header/AdminHeader';
 import AdminFooter from '../components/admin/footer/AdminFooter';
 import AdminSider from '../components/admin/sider/AdminSider';
 import ContentHeader from '../components/admin/content/ContentHeader';
-import Trips from '../components/admin/Trips';
+import Trips from '../components/admin/TripList';
 import TravelPlan from '../components/admin/TravelPlan';
 import UserList from '../components/admin/UserList';
 import UserModal from '../components/admin/UserModal';
