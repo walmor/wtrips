@@ -15,9 +15,11 @@ beforeEach(async () => {
   await mongodbInMemory.clearDatabase();
 });
 
-describe('The admin user', async () => {
-  const admin = async () => createUser({ role: 'admin', email: 'admin@example.com' });
+const admin = async () => createUser({ role: 'admin' });
+const manager = async () => createUser({ role: 'manager' });
+const user = async () => createUser({ role: 'user' });
 
+describe('The admin user', async () => {
   it('should have access to list users', async () => {
     const adm = await admin();
     await expect(ensureAuthorized(adm, 'user', 'list')).resolves.not.toThrow();
@@ -52,21 +54,45 @@ describe('The admin user', async () => {
 });
 
 describe('The manager user', async () => {
-  const manager = async () => createUser({ role: 'manager', email: 'manager@example.com' });
-
   it('should have access to list users', async () => {
     const mng = await manager();
     await expect(ensureAuthorized(mng, 'user', 'list')).resolves.not.toThrow();
   });
 
-  it('should have access to edit users', async () => {
+  it('should have access to edit regular users', async () => {
     const mng = await manager();
-    await expect(ensureAuthorized(mng, 'user', 'edit')).resolves.not.toThrow();
+    const usr = await user();
+    await expect(ensureAuthorized(mng, usr, 'edit')).resolves.not.toThrow();
   });
 
-  it('should have access to update users', async () => {
+  it('should have access to edit manager users', async () => {
     const mng = await manager();
-    await expect(ensureAuthorized(mng, 'user', 'update')).resolves.not.toThrow();
+    const mng2 = await manager();
+    await expect(ensureAuthorized(mng, mng2, 'edit')).resolves.not.toThrow();
+  });
+
+  it('should not have access to edit admin users', async () => {
+    const mng = await manager();
+    const adm = await admin();
+    await expect(ensureAuthorized(mng, adm, 'edit')).rejects.toThrow(Forbidden);
+  });
+
+  it('should have access to update regular users', async () => {
+    const mng = await manager();
+    const usr = await user();
+    await expect(ensureAuthorized(mng, usr, 'update')).resolves.not.toThrow();
+  });
+
+  it('should have access to update manager users', async () => {
+    const mng = await manager();
+    const mng2 = await manager();
+    await expect(ensureAuthorized(mng, mng2, 'update')).resolves.not.toThrow();
+  });
+
+  it('should not have access to update admin users', async () => {
+    const mng = await manager();
+    const adm = await admin();
+    await expect(ensureAuthorized(mng, adm, 'update')).rejects.toThrow(Forbidden);
   });
 
   it('should have access to list trips', async () => {
@@ -130,8 +156,6 @@ describe('The manager user', async () => {
 });
 
 describe('The regular user', async () => {
-  const user = async () => createUser({ role: 'user', email: 'user@example.com' });
-
   it('should have access to list trips', async () => {
     const usr = await user();
     await expect(ensureAuthorized(usr, 'trip', 'list')).resolves.not.toThrow();

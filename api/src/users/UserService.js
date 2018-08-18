@@ -34,6 +34,8 @@ class UserService {
       }
     } else if (data.password) {
       throw new Forbidden('Only the user is allowed to changed his password.');
+    } else if (data.role === 'admin' && this.currUser.role === 'manager') {
+      throw new Forbidden('A manager user cannot set the user role to admin.');
     }
 
     user.set(data);
@@ -66,6 +68,10 @@ class UserService {
 
     if (opts.isActive !== null) {
       conditions = { $and: [conditions, { isActive: opts.isActive }] };
+    }
+
+    if (this.currUser.role === 'manager') {
+      conditions = { $and: [conditions, { role: { $ne: 'admin' } }] };
     }
 
     const totalCount = await User.countDocuments(conditions);

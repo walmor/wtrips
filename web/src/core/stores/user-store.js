@@ -1,15 +1,10 @@
-import { observable, action } from 'mobx';
+import { observable, action, runInAction } from 'mobx';
 import queryString from 'query-string';
 import history from '../history';
 import setErrorMessage from '../get-error-message';
 
 const PAGE_SIZE = 10;
 const USERS_URL = '/users/';
-const ROLES = {
-  user: 'User',
-  manager: 'Manager',
-  admin: 'Admin',
-};
 
 export default class UserStore {
   @observable
@@ -36,17 +31,19 @@ export default class UserStore {
   constructor(apiClient, appStore) {
     this.appStore = appStore;
     this.api = apiClient;
-    this.roles = ROLES;
     this.loaded = false;
 
     this.init();
   }
 
+  @action
   async load() {
     if (this.loaded) return;
     this.loaded = true;
 
-    history.listen(async (location) => {
+    this.setRoles();
+
+    this.unlistenHistory = history.listen(async (location) => {
       if (location.pathname.startsWith('/admin/users')) {
         await this.loadUsers();
       }
@@ -63,15 +60,19 @@ export default class UserStore {
 
       const response = await this.fetchUsers(this.query);
 
-      this.pagination.total = response.totalCount;
-      this.pagination.current = this.query.page;
-      this.users.replace(response.users);
+      runInAction(() => {
+        this.loading = false;
+        this.pagination.total = response.totalCount;
+        this.pagination.current = this.query.page;
+        this.users.replace(response.users);
+      });
     } catch (err) {
       setErrorMessage(err, (msg) => {
-        this.error = msg;
+        runInAction(() => {
+          this.loading = false;
+          this.error = msg;
+        });
       });
-    } finally {
-      this.loading = false;
     }
   }
 
@@ -107,9 +108,11 @@ export default class UserStore {
       if (this.userEditing.isCurrentUser) {
         await this.appStore.auth.renewToken();
       }
-
-      this.observeUser(usr);
-      this.endEditing();
+      
+      runInAction(() => {
+        this.observeUser(usr);
+        this.endEditing();
+      });
     } catch (err) {
       setErrorMessage(err, (msg) => {
         this.userEditing.error = msg;
@@ -130,11 +133,14 @@ export default class UserStore {
     });
   }
 
+  @action
   init() {
+    this.loaded = false;
     this.loading = false;
     this.error = null;
     this.allUsers.clear();
     this.users.clear();
+    this.roles = {};
 
     this.pagination = {
       pageSize: PAGE_SIZE,
@@ -157,13 +163,33 @@ export default class UserStore {
       isCurrentUser: false,
       saveUser: id => this.saveUser(id),
       cancelEditing: () => this.endEditing(),
-      roles: ROLES,
+      roles: {},
     };
+  }
+
+  @action
+  setRoles() {
+    const { currentUser } = this.appStore.auth;
+
+    const roles = {
+      user: 'User',
+      manager: 'Manager',
+    };
+
+    if (currentUser.role === 'admin') {
+      roles.admin = 'Admin';
+    }
+
+    this.roles = roles;
+    this.userEditing.roles = roles;
   }
 
   @action
   clear() {
     this.init();
+    if (this.unlistenHistory) {
+      this.unlistenHistory();
+    }
   }
 
   async fetchUsers(query) {
@@ -172,6 +198,7 @@ export default class UserStore {
     return response;
   }
 
+  @action
   observeUser(user) {
     let obsUser = this.allUsers.get(user._id);
 
@@ -212,6 +239,7 @@ export default class UserStore {
     history.push(location);
   }
 
+  @action
   updateQueryString() {
     const qs = queryString.parse(history.location.search) || {};
 

@@ -39,7 +39,16 @@ acl.allow('user', 'user', ['edit', 'update'], (err, role, resource, action, resu
   return result(null, false);
 });
 
-acl.allow('manager', 'user', ['list', 'edit', 'update']);
+acl.allow('manager', 'user', 'list');
+acl.allow('manager', 'user', ['edit', 'update'], (err, role, resource, action, result, next) => {
+  if (!(role instanceof User) || !(resource instanceof User)) return next();
+
+  if (resource.role === 'admin') {
+    return result(null, false);
+  }
+
+  return result(null, true);
+});
 
 async function ensureAuthorized(user, resource, action) {
   const forbidden = new Forbidden('Access denied');

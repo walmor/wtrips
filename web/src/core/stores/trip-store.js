@@ -48,7 +48,7 @@ export default class TripStore {
     if (this.loaded) return;
     this.loaded = true;
 
-    history.listen(async (location) => {
+    this.unlistenHistory = history.listen(async (location) => {
       if (location.pathname.startsWith('/admin/trips')) {
         await this.fetchTrips();
       }
@@ -212,6 +212,7 @@ export default class TripStore {
 
   @action
   init() {
+    this.loaded = false;
     this.loading = false;
     this.error = null;
     this.allTrips.clear();
@@ -247,6 +248,10 @@ export default class TripStore {
   @action
   clear() {
     this.init();
+    
+    if (this.unlistenHistory) {
+      this.unlistenHistory();
+    }
   }
 
   @action

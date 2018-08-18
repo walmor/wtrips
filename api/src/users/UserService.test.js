@@ -18,8 +18,8 @@ beforeEach(async () => {
   acl.default.mockClear();
 });
 
-async function getServiceWithCurrUsr() {
-  const currUser = await createUser();
+async function getServiceWithCurrUsr(userProps) {
+  const currUser = await createUser(userProps);
   await currUser.save();
 
   const service = new UserService(currUser);
@@ -134,6 +134,22 @@ describe('The UserService', () => {
       expect(updatedUser.name).toEqual(name);
       expect(updatedUser.email).toEqual(email);
     });
+
+    it('should not allow a manager to change the user role to admin', async () => {
+      const { service } = await getServiceWithCurrUsr({ role: 'manager' });
+      const usr = await createUser({ role: 'user' });
+      await usr.save();
+
+      const userData = {
+        name: usr.name,
+        email: usr.email,
+        role: 'admin',
+      };
+
+      const udpate = service.update(usr._id, userData);
+
+      await expect(udpate).rejects.toThrowError(Forbidden);
+    });
   });
 
   describe('when listing users', () => {
@@ -223,6 +239,22 @@ describe('The UserService', () => {
       const result = await service.list({ search: email });
 
       expect(result.users.length).toBe(1);
+    });
+
+    it('shoult not return admin users when the current user is manager', async () => {
+      const { service } = await getServiceWithCurrUsr({ role: 'manager' });
+
+      const adm = await createUser({ role: 'admin' });
+      await adm.save();
+
+      const usr = await createUser({ role: 'user' });
+      await usr.save();
+
+      const result = await service.list();
+
+      expect(result.users.length).toBe(2);
+      expect(result.users[0].role).not.toEqual('admin');
+      expect(result.users[1].role).not.toEqual('admin');
     });
   });
 });
