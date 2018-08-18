@@ -172,6 +172,7 @@ class TripService {
       throw new BadRequest('The end date should be greater than or equal to the start date.');
     }
 
+    // eslint-disable-next-line prefer-const
     let [sortField, sortOrder] = sort.split(':');
 
     if (Trip.schema.pathType(sortField) === 'adhocOrUndefined') {
@@ -180,15 +181,7 @@ class TripService {
 
     sortOrder = sortOrder === 'desc' ? -1 : 1;
 
-    let userId = this.currUser.id;
-
-    if (this.currUser.role === 'admin') {
-      if (opts.userId && !mongoose.Types.ObjectId.isValid(opts.userId)) {
-        throw new BadRequest('Invalid user id.');
-      }
-
-      userId = opts.userId || null;
-    }
+    const userId = this.sanitizeUserIdFilter(opts);
 
     return {
       search,
@@ -227,13 +220,23 @@ class TripService {
       throw new BadRequest('The filter date should be greater than the current date.');
     }
 
+    const userId = this.sanitizeUserIdFilter(opts);
+
+    return { userId, baseDate };
+  }
+
+  sanitizeUserIdFilter(opts) {
     let userId = this.currUser.id;
 
     if (this.currUser.role === 'admin') {
+      if (opts.userId && !mongoose.Types.ObjectId.isValid(opts.userId)) {
+        throw new BadRequest('Invalid user id.');
+      }
+
       userId = opts.userId || null;
     }
 
-    return { userId, baseDate };
+    return userId;
   }
 
   async saveTrip(trip, tripData) {
