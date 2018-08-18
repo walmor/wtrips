@@ -134,7 +134,7 @@ class TripModal extends React.Component {
       >
         <Form>
           <FormField id="destination" options={opts.destination}>
-            <Input prefix={<Icon type="global" />} placeholder="Destination" />
+            <Input prefix={<Icon type="global" />} maxLength={50} placeholder="Destination" />
           </FormField>
           {canManageUserTrips && (
             <React.Fragment>
@@ -166,7 +166,7 @@ class TripModal extends React.Component {
             <RangePicker format={config.dateFormat} className="TripRangePicker" />
           </FormField>
           <FormField id="comment" options={opts.comment}>
-            <TextArea placeholder="Comment" autosize={{ minRows: 2, maxRows: 6 }} />
+            <TextArea placeholder="Comment" maxLength={1000} autosize={{ minRows: 2, maxRows: 6 }} />
           </FormField>
           <ErrorMessage message={this.props.error} />
         </Form>

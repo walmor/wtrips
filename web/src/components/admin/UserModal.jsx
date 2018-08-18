@@ -29,7 +29,7 @@ class UserModal extends React.Component {
     const user = this.props.user || {};
 
     const name = {
-      initialValue: user.name,
+      initialValue: user.name,      
       rules: [{ required: true, whitespace: true, message: 'The name is required.' }],
     };
 
@@ -162,7 +162,7 @@ class UserModal extends React.Component {
       >
         <Form layout="horizontal">
           <FormField id="name" options={opts.name}>
-            <Input prefix={<Icon type="user" />} placeholder="Name" />
+            <Input prefix={<Icon type="user" />} maxLength={50} placeholder="Name" />
           </FormField>
           <FormField id="email" options={opts.email}>
             <Input prefix={<Icon type="mail" />} placeholder="E-mail" />

@@ -147,6 +147,7 @@ class SignUpForm extends React.Component {
               ref={(input) => {
                 this.firstInput = input;
               }}
+              maxLength={50}
               placeholder="Name"
             />
           </FormField>
