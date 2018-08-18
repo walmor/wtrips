@@ -17,14 +17,14 @@ const SiderMenu = ({ onMenuItemClick, selectedMenuKey, canManageUsers }) => (
         <span>Trips</span>
       </Link>
     </Menu.Item>
-    <Menu.Item key="travelplan">
+    <Menu.Item className="TravelPlanMenuItem" key="travelplan">
       <Link to="/admin/travelplan">
         <Icon type="calendar" />
         <span>Travel plan</span>
       </Link>
     </Menu.Item>
     {canManageUsers && (
-      <Menu.Item key="users">
+      <Menu.Item className="UsersMenuItem" key="users">
         <Link to="/admin/users">
           <Icon type="team" />
           <span>Users</span>

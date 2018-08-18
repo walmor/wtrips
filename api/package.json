@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "test": "jest --watch",
-    "start": "nodemon ./src/server.js --exec babel-node"
+    "start": "nodemon ./src/server.js --exec babel-node",
+    "seed-db": "NODE_ENV=e2e babel-node ./src/__tests__/utils/seed-db.js"
   },
   "author": "Walmor Moreira",
   "license": "ISC",

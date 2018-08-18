@@ -5,7 +5,7 @@ import Trip from '../../trips/Trip';
 
 async function createUser(props) {
   const user = {
-    name: casual.name,
+    name: casual.full_name,
     email: casual.email,
     role: 'user',
     password: '123456',
@@ -21,7 +21,7 @@ async function createUsers(qty) {
 
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < qty; i++) {
-    const user = await createUser({ name: casual.name, email: casual.email });
+    const user = await createUser();
     await user.save();
     users.push(user);
   }
@@ -45,7 +45,7 @@ async function createTrip(props) {
     destination: 'New Zealand',
     startDate: new Date('2019-01-01'),
     endDate: new Date('2019-02-01'),
-    comment: 'This is going to be an awesome trip.',    
+    comment: casual.short_description,
     user: user.id,
   };
 
@@ -55,26 +55,27 @@ async function createTrip(props) {
 async function createTrips(qty, user) {
   const trips = [];
 
-  /* eslint-disable no-await-in-loop */
   for (let i = 0; i < qty; i++) {
     const destination = casual.country;
-    const date = moment().startOf('day').add(casual.integer(-60, 200), 'days');
+    const comment = casual.short_description;
+    const date = moment()
+      .startOf('day')
+      .add(casual.integer(-10, 100), 'days');
     const startDate = date.toDate();
-    const endDate = date.add(casual.integer(1, 30), 'days').toDate();
+    const endDate = date.add(casual.integer(1, 20), 'days').toDate();
 
-    const props = {
+    const tripData = {
       destination,
       startDate,
       endDate,
+      comment,
       user,
     };
 
-    const trip = await createTrip(props);
-    await trip.save();
-    trips.push(trip);
+    trips.push(tripData);
   }
 
-  return trips;
+  return Promise.all(trips.map(async trip => (await createTrip(trip)).save()));
 }
 
 function testRequiredProperty(createModel) {

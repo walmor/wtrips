@@ -170,9 +170,9 @@ class UserModal extends React.Component {
           {!isCurrentUser && (
             <React.Fragment>
               <FormField id="role" options={opts.role}>
-                <Select placeholder="Select a role">
+                <Select className="UserRolesSelect" placeholder="Select a role">
                   {Object.entries(roles).map(([key, name]) => (
-                    <Option key={key} value={key}>
+                    <Option className={`RoleSelectOption-${key}`} key={key} value={key}>
                       {name}
                     </Option>
                   ))}

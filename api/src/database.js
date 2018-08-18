@@ -10,3 +10,7 @@ export default async function startDatabase() {
     { useNewUrlParser: true },
   );
 }
+
+export async function diconnectDatabase() {
+  return mongoose.disconnect();
+}

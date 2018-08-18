@@ -96,7 +96,7 @@ function getTableColumns(smallWidth, onEdit, onDelete, canManageUserTrips) {
     <span>
       {trip.deleting && <Spin indicator={<Icon type="loading" />} size="small" />}
       {!trip.deleting && <EditListActionButton onClick={() => onEdit(trip._id)} />}
-      {!trip.deleting && <DeleteListActionButton onConfirm={() => onDelete(trip._id)} />}
+      {!trip.deleting && <DeleteListActionButton className="DeleteTripActionButton" onConfirm={() => onDelete(trip._id)} />}
     </span>
   ));
 
@@ -155,7 +155,7 @@ class TripList extends React.Component {
         <div>
           <div className="TripSearchPanel">
             <div>
-              <Button type="primary" onClick={onCreate}>
+              <Button className="CreateTripButton" type="primary" onClick={onCreate}>
                 Create trip
               </Button>
             </div>

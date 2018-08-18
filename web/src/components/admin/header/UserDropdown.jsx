@@ -8,12 +8,12 @@ import bp from '../../../core/mq-breakpoints';
 const UserDropdown = ({ onSignOut, editProfile, username }) => {
   const menu = (
     <Menu className="UserDropdownMenu" selectedKeys={[]}>
-      <Menu.Item onClick={editProfile}>
+      <Menu.Item className="MyProfileMenuItem" onClick={editProfile}>
         <Icon type="setting" />
         My profile
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="logout" onClick={onSignOut}>
+      <Menu.Item key="signout" className="SignOutMenuItem" onClick={onSignOut}>
         <Icon type="logout" />
         Sign out
       </Menu.Item>
