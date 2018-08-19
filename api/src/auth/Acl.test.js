@@ -1,4 +1,4 @@
-import { Forbidden } from 'http-errors';
+import { Forbidden, Unauthorized } from 'http-errors';
 import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
 import ensureAuthorized from './Acl';
 import { createUser, createTrip } from '../__tests__/utils/helpers';
@@ -255,13 +255,13 @@ describe('The regular user', async () => {
 
 describe('An anonymous user', () => {
   it('should not have access to anything', async () => {
-    await expect(ensureAuthorized(null, 'trip', 'list')).rejects.toThrow(Forbidden);
+    await expect(ensureAuthorized(null, 'trip', 'list')).rejects.toThrow(Unauthorized);
   });
 });
 
 describe('An inactive user', () => {
   it('should not have access to anything', async () => {
-    const user = await createUser({ isActive: false });
-    await expect(ensureAuthorized(user, 'trip', 'list')).rejects.toThrow(Forbidden);
+    const usr = await createUser({ isActive: false });
+    await expect(ensureAuthorized(usr, 'trip', 'list')).rejects.toThrow(Unauthorized);
   });
 });

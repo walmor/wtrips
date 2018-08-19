@@ -1,6 +1,6 @@
 import { Acl } from 'virgen-acl';
 import { promisify } from 'util';
-import { Forbidden } from 'http-errors';
+import { Forbidden, Unauthorized } from 'http-errors';
 import User from '../users/User';
 import Trip from '../trips/Trip';
 
@@ -51,17 +51,15 @@ acl.allow('manager', 'user', ['edit', 'update'], (err, role, resource, action, r
 });
 
 async function ensureAuthorized(user, resource, action) {
-  const forbidden = new Forbidden('Access denied');
-
   if (!user || !user.isActive) {
-    throw forbidden;
+    throw new Unauthorized('User not authenticated or blocked.');
   }
 
   const query = promisify(acl.query.bind(acl));
   const authorized = await query(user, resource, action);
 
   if (!authorized) {
-    throw forbidden;
+    throw new Forbidden('Access denied');
   }
 }
 
