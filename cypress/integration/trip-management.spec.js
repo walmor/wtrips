@@ -28,7 +28,7 @@ function fillOutTripFormAndSubmit(method, alias, destination) {
 
   cy.wait(`@${alias}`)
     .its('status')
-    .should('eq', 200);
+    .should('eq', method === 'POST' ? 201 : 200);
 }
 
 function clickOnFirstTrip() {

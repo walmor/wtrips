@@ -19,7 +19,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  res.json(await req.tripService.create(req.body));
+  res.status(201).json(await req.tripService.create(req.body));
 });
 
 router.put('/:id', async (req, res) => {
