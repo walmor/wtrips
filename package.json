@@ -8,7 +8,8 @@
     "start-api": "cd ./api && yarn start",
     "start-web": "cd ./web && yarn start",
     "seed-db": "cd ./api && yarn seed-db",
-    "start": "NODE_ENV=e2e concurrently \"yarn start-api\" \"yarn start-web\"",
+    "start": "concurrently \"yarn start-api\" \"yarn start-web\"",
+    "start-e2e": "NODE_ENV=e2e yarn start",
     "cypress": "cypress open"
   },
   "repository": {

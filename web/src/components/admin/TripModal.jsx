@@ -134,7 +134,7 @@ class TripModal extends React.Component {
       >
         <Form>
           <FormField id="destination" options={opts.destination}>
-            <Input prefix={<Icon type="global" />} maxLength={50} placeholder="Destination" />
+            <Input prefix={<Icon type="global" />} maxLength={50} autoFocus placeholder="Destination" />
           </FormField>
           {canManageUserTrips && (
             <React.Fragment>

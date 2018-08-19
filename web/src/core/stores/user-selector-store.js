@@ -58,6 +58,8 @@ export default class UserSelectorStore {
   setInitialUser(user) {
     this.initialUser = user;
     this.selectedUser = user;
+
+    this.populateWithCurrentUsers();
   }
 
   @action

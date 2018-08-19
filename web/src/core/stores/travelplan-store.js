@@ -46,19 +46,12 @@ export default class TravelPlanStore {
     });
 
     await this.fetchTravelPlan();
+
     const { auth } = this.appStore;
 
     if (auth.canManageUserTrips) {
       await this.userSelector.load();
-
-      const qsUser = this.query.user;
-
-      if (!qsUser || qsUser === 'me') {
-        this.userSelector.selectedUser = null;
-      } else {
-        const { allUsers } = this.appStore.users;
-        this.userSelector.selectedUser = allUsers.get(qsUser);
-      }
+      this.updateUserSelector();
     }
   }
 
@@ -165,6 +158,24 @@ export default class TravelPlanStore {
       this.query.userId = currentUser._id;
     } else {
       this.query.userId = qs.user;
+    }
+
+    this.updateUserSelector();
+  }
+
+  @action
+  updateUserSelector() {
+    const { auth } = this.appStore;
+
+    if (auth.canManageUserTrips) {
+      const qsuser = this.query.user;
+
+      if (!qsuser || qsuser === 'me') {
+        this.userSelector.selectedUser = null;
+      } else {
+        const { allUsers } = this.appStore.users;
+        this.userSelector.selectedUser = allUsers.get(qsuser);
+      }
     }
   }
 }

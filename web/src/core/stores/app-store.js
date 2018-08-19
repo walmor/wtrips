@@ -32,6 +32,7 @@ class AppStore {
   clear() {
     this.users.clear();
     this.trips.clear();
+    this.travelplan.clear();
   }
 }
 
