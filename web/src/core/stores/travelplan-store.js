@@ -76,10 +76,10 @@ export default class TravelPlanStore {
         this.trips.replace(trips);
       });
     } catch (err) {
-      setErrorMessage(err, (msg) => {
-        runInAction(() => {
+      runInAction(() => {
+        this.loading = false;
+        setErrorMessage(err, (msg) => {
           this.error = msg;
-          this.loading = false;
         });
       });
     }

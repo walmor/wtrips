@@ -67,9 +67,9 @@ export default class UserStore {
         this.users.replace(response.users);
       });
     } catch (err) {
-      setErrorMessage(err, (msg) => {
-        runInAction(() => {
-          this.loading = false;
+      runInAction(() => {
+        this.loading = false;
+        setErrorMessage(err, (msg) => {
           this.error = msg;
         });
       });
@@ -108,7 +108,7 @@ export default class UserStore {
       if (this.userEditing.isCurrentUser) {
         await this.appStore.auth.renewToken();
       }
-      
+
       runInAction(() => {
         this.observeUser(usr);
         this.endEditing();

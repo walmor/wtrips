@@ -33,7 +33,7 @@ export default class TripStore {
     this.appStore = appStore;
     this.api = apiClient;
     this.loaded = false;
-    
+
     this.userSelector = new UserSelectorStore(appStore);
     this.userSelector.placeholder = 'Filter by user';
     this.userSelector.onUserSelected = (user) => {
@@ -89,10 +89,10 @@ export default class TripStore {
         this.trips.replace(response.trips.map(u => this.observeTrip(u)));
       });
     } catch (err) {
-      setErrorMessage(err, (msg) => {
-        runInAction(() => {
+      runInAction(() => {
+        this.loading = false;
+        setErrorMessage(err, (msg) => {
           this.error = msg;
-          this.loading = false;
         });
       });
     }
@@ -187,10 +187,10 @@ export default class TripStore {
         await this.fetchTrips();
       });
     } catch (err) {
-      setErrorMessage((msg) => {
-        runInAction(() => {
+      runInAction(() => {
+        trip.deleting = false;
+        setErrorMessage((msg) => {
           this.error = msg;
-          trip.deleting = false;
         });
       });
     } finally {
@@ -248,7 +248,7 @@ export default class TripStore {
   @action
   clear() {
     this.init();
-    
+
     if (this.unlistenHistory) {
       this.unlistenHistory();
     }
