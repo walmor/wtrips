@@ -1,7 +1,7 @@
 {
-  "name": "toptal-trips",
+  "name": "w-trips",
   "version": "1.0.0",
-  "description": "Toptal test project",
+  "description": "wTrips project",
   "main": "index.js",
   "scripts": {
     "test": "cd ./api && yarn test",
@@ -11,10 +11,6 @@
     "start": "concurrently \"yarn start-api\" \"yarn start-web\"",
     "start-e2e": "NODE_ENV=e2e yarn start",
     "cypress": "cypress open"
-  },
-  "repository": {
-    "type": "git",
-    "url": "http://git.toptal.com/screening/walmor-costa-moreira.git"
   },
   "author": "Walmor Moreira",
   "license": "ISC",

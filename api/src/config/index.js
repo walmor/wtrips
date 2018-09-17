@@ -30,7 +30,7 @@ const defaults = {
   dev: {
     db: {
       host: 'localhost',
-      name: 'toptaltrips-dev',
+      name: 'wtrips-dev',
     },
   },
 
@@ -38,7 +38,7 @@ const defaults = {
   test: {
     db: {
       host: 'localhost',
-      name: 'toptaltrips-test',
+      name: 'wtrips-test',
     },
   },
 };

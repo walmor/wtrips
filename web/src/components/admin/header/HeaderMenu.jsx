@@ -5,7 +5,7 @@ import UserDropdown from './UserDropdown';
 
 const HeaderMenu = ({ className }) => (
   <div className={`HeaderMenu ${className || ''}`}>
-    <HeaderMenuLink url="http://www.toptal.com" tooltip="Toptal" icon="question-circle-o" />
+    <HeaderMenuLink url="http://www.github.com/walmor" tooltip="About" icon="question-circle-o" />
     <UserDropdown username="Walmor" />
   </div>
 );

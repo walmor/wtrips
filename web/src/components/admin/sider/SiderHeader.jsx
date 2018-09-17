@@ -4,7 +4,7 @@ import logo from '../../../assets/logo.svg';
 const SiderHeader = () => (
   <div className="SiderHeader">
     <img src={logo} alt="logo" />
-    <h1>Toptal Trips</h1>
+    <h1>wTrips</h1>
   </div>
 );
 

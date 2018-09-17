@@ -1,7 +1,7 @@
 {
-  "name": "toptal-trips-api",
+  "name": "w-trips-api",
   "version": "1.0.0",
-  "description": "REST API for Toptal Test Project",
+  "description": "REST API for wTrips",
   "main": "index.js",
   "private": true,
   "scripts": {

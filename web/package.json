@@ -1,5 +1,5 @@
 {
-  "name": "toptaltrips-web",
+  "name": "wtrips-web",
   "version": "1.0.0",
   "private": true,
   "proxy": "http://localhost:3443",

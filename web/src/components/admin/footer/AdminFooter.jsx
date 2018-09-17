@@ -5,7 +5,7 @@ const { Footer } = Layout;
 
 const AdminFooter = () => (
   <Footer className="AdminFooter">
-    <span>Toptal Trips - by Walmor Moreira</span>
+    <span>wTrips - by Walmor Moreira</span>
   </Footer>
 );
 
