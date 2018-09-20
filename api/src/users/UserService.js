@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
 import { NotFound, Forbidden, BadRequest } from 'http-errors';
 import ensureAuthorized from '../auth/Acl';
-import User from './User';
 import validateAndSanitizeUserData from './UserSchema';
+import userRepository from './UserRepository';
 
 class UserService {
   constructor(user) {
@@ -14,9 +13,9 @@ class UserService {
 
     await this.ensureAuthorized('update', user);
 
-    const data = await validateAndSanitizeUserData('update', { _id: user._id, ...userData });
+    const data = await validateAndSanitizeUserData('update', { id: user.id, ...userData });
 
-    if (user._id.equals(this.currUser.id)) {
+    if (user.id === this.currUser.id) {
       if (data.role !== undefined && data.role !== this.currUser.role) {
         throw new Forbidden('The user cannot change his own role.');
       }
@@ -38,10 +37,9 @@ class UserService {
       throw new Forbidden('A manager user cannot set the user role to admin.');
     }
 
-    user.set(data);
+    const updatedUser = await userRepository.update(user.id, userData);
 
-    await user.save();
-    return user.toObject();
+    return updatedUser.toObject();
   }
 
   async get(id) {
@@ -57,28 +55,7 @@ class UserService {
 
     const opts = this.sanitizeListOpts(options);
 
-    const skip = (opts.page - 1) * opts.pageSize;
-
-    let conditions = {};
-
-    if (opts.search) {
-      const regex = new RegExp(opts.search, 'i');
-      conditions = { $or: [{ name: regex }, { email: regex }] };
-    }
-
-    if (opts.isActive !== null) {
-      conditions = { $and: [conditions, { isActive: opts.isActive }] };
-    }
-
-    if (this.currUser.role === 'manager') {
-      conditions = { $and: [conditions, { role: { $ne: 'admin' } }] };
-    }
-
-    const totalCount = await User.countDocuments(conditions);
-    const userModels = await User.find(conditions, null, { skip, limit: opts.pageSize, sort: { createdAt: -1 } });
-    const users = userModels.map(u => u.toObject());
-
-    return { totalCount, users };
+    return userRepository.list(opts);
   }
 
   sanitizeListOpts(options) {
@@ -88,6 +65,7 @@ class UserService {
     const page = parseInt(opts.page || 1, 10);
     const pageSize = parseInt(opts.pageSize || 20, 10);
     let isActive = opts.isActive !== undefined ? opts.isActive.toLowerCase() : null;
+    const isManager = this.currUser.role === 'manager';
 
     if (isActive === '' || isActive === 'true') {
       isActive = true;
@@ -108,17 +86,19 @@ class UserService {
       page,
       pageSize,
       isActive,
+      isManager,
     };
   }
 
   async ensureUserExists(id) {
     const notFound = new NotFound('User not found.');
+    const userId = parseInt(id, 10);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!Number.isInteger(userId)) {
       throw notFound;
     }
 
-    const user = await User.findById(id);
+    const user = await userRepository.findById(userId);
 
     if (!user) {
       throw notFound;

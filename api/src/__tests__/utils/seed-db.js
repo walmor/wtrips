@@ -1,11 +1,5 @@
-import mongoose from 'mongoose';
-import startDatabase, { diconnectDatabase } from '../../database';
+import testDbManager from './test-db';
 import { createUser, createUsers, createTrips } from './helpers';
-
-async function clearDatabase() {
-  const collections = await mongoose.connection.db.collections();
-  return Promise.all(collections.map(c => c.remove()));
-}
 
 async function seedDatabase() {
   const admin = await createUser({
@@ -26,10 +20,6 @@ async function seedDatabase() {
     role: 'manager',
   });
 
-  await admin.save();
-  await user.save();
-  await manager.save();
-
   const users = [admin, user, manager];
 
   const randomUsers = await createUsers(2);
@@ -39,11 +29,12 @@ async function seedDatabase() {
 }
 
 /* eslint-disable no-console */
-startDatabase()
+testDbManager
+  .init()
   .then(async () => {
     try {
       console.log('Cleaning up the database...');
-      await clearDatabase();
+      await testDbManager.clearDatabase();
 
       console.log('Seeding the database...');
       await seedDatabase();
@@ -59,5 +50,5 @@ startDatabase()
     process.exit(1);
   })
   .finally(async () => {
-    await diconnectDatabase();
+    await testDbManager.stop();
   });

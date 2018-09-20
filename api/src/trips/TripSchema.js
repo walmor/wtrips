@@ -1,6 +1,5 @@
 import * as yup from 'yup';
 import xss from 'xss';
-import mongoose from 'mongoose';
 import { BadRequest } from 'http-errors';
 
 const sanitize = new xss.FilterXSS({
@@ -25,9 +24,7 @@ const tripSchema = yup.object().shape({
     .date()
     .required()
     .min(yup.ref('startDate'), 'The endDate should be greater than or equal to the startDate'),
-  userId: yup
-    .string()
-    .test('invalid-user-id', 'The user id is invalid.', id => !id || mongoose.Types.ObjectId.isValid(id)),
+  userId: yup.number().test('invalid-user-id', 'The user id is invalid.', id => !id || Number.isInteger(id)),
 });
 
 async function validateAndSanitizeTripData(data) {

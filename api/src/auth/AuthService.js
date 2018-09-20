@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { Unauthorized, BadRequest, InternalServerError } from 'http-errors';
-import User from '../users/User';
 import config from '../config';
 import validateAndSanitizeUserData from '../users/UserSchema';
+import userRepository from '../users/UserRepository';
 
 function createAuthReturn(usr) {
   const user = usr.toObject();
   const token = jwt.sign(
     {
       user: {
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -33,11 +33,10 @@ class AuthService {
     }
 
     const data = await validateAndSanitizeUserData('create', userData);
+    data.lastIpAddress = ipAddress;
 
-    const user = new User(data);
-    user.lastIPAddress = ipAddress;
+    const user = await userRepository.insert(data);
 
-    await user.save();
     return createAuthReturn(user);
   }
 
@@ -54,7 +53,7 @@ class AuthService {
       throw new InternalServerError('The IP address is required.');
     }
 
-    const user = await User.findOne({ email });
+    const user = await userRepository.findByEmail(email);
 
     const unauthorized = new Unauthorized('Invalid email or password.');
 
@@ -68,8 +67,8 @@ class AuthService {
       throw unauthorized;
     }
 
-    user.lastIPAddress = ipAddress;
-    await user.save();
+    user.lastIpAddress = ipAddress;
+    await userRepository.update(user.id, user);
 
     return createAuthReturn(user);
   }
@@ -79,9 +78,9 @@ class AuthService {
       throw new BadRequest('The email is required.');
     }
 
-    const user = await User.findOne({ email });
+    const isAvailable = await userRepository.isEmailAvailable(email);
 
-    return { email, isAvailable: user === null };
+    return { email, isAvailable };
   }
 
   async renewToken() {

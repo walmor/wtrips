@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import _ from 'lodash';
 import path from 'path';
+import { knexSnakeCaseMappers } from 'objection';
 
 const env = process.env.NODE_ENV || 'dev';
 
@@ -10,13 +11,20 @@ const schema = {
   app: {
     port: parseInt(process.env.APP_PORT, 10) || 3000,
   },
-  db: {
-    host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT, 10) || 27017,
-    name: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    authSource: process.env.DB_AUTH_SOURCE || 'admin',
+  knex: {
+    client: process.env.DB_CLIENT || 'postgresql',
+    connection: {
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT, 10) || 5432,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+    },
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: path.resolve(__dirname, '../db/migrations'),
+    },
+    ...knexSnakeCaseMappers(),
   },
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -28,17 +36,21 @@ const schema = {
 const defaults = {
   // dev environment
   dev: {
-    db: {
-      host: 'localhost',
-      name: 'wtrips-dev',
+    knex: {
+      connection: {
+        host: 'localhost',
+        database: 'wtrips_dev',
+      },
     },
   },
 
   // test environment
   test: {
-    db: {
-      host: 'localhost',
-      name: 'wtrips-test',
+    knex: {
+      connection: {
+        host: 'localhost',
+        database: 'wtrips_test',
+      },
     },
   },
 };

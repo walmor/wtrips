@@ -1,19 +1,19 @@
 import { Unauthorized, BadRequest, InternalServerError } from 'http-errors';
-import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
+import testDbManager from '../__tests__/utils/test-db';
 import { createUser } from '../__tests__/utils/helpers';
-import User from '../users/User';
 import AuthService from './AuthService';
+import userRepository from '../users/UserRepository';
 
 beforeAll(async () => {
-  await mongodbInMemory.init();
+  await testDbManager.init();
 });
 
 afterAll(async () => {
-  await mongodbInMemory.stop();
+  await testDbManager.stop();
 });
 
 beforeEach(async () => {
-  await mongodbInMemory.clearDatabase();
+  await testDbManager.clearDatabase();
 });
 
 function getUserData() {
@@ -21,7 +21,7 @@ function getUserData() {
     name: 'Peter',
     email: 'peter@example.com',
     password: 'password',
-    lastIPAddress: '189.100.242.238',
+    lastIpAddress: '189.100.242.238',
   };
 }
 
@@ -35,7 +35,7 @@ describe('The AuthService', () => {
       await expect(signup).rejects.toThrow(BadRequest);
     });
 
-    it('should throw InternalServerError if the user data is invalid', async () => {
+    it('should throw InternalServerError if the IP address is invalid', async () => {
       const userData = getUserData();
       const signup = service.signup(userData, null);
 
@@ -75,7 +75,6 @@ describe('The AuthService', () => {
     it('should throw Unauthorized if the password is valid', async () => {
       const password = '1234';
       const user = await createUser({ password });
-      await user.save();
 
       const signin = service.signin(user.email, 'different-pwd', '1.1.1.1');
       await expect(signin).rejects.toThrow(Unauthorized);
@@ -84,7 +83,6 @@ describe('The AuthService', () => {
     it('should throw Unauthorized if the user is inactive', async () => {
       const password = '1234';
       const user = await createUser({ password, isActive: false });
-      await user.save();
 
       const signin = service.signin(user.email, password, '1.1.1.1');
       await expect(signin).rejects.toThrow(Unauthorized);
@@ -94,19 +92,17 @@ describe('The AuthService', () => {
       const password = '1234';
       const ip = '1.1.1.1';
       const user = await createUser({ password });
-      await user.save();
 
       await service.signin(user.email, password, ip);
 
-      const savedUser = await User.findById(user.id);
+      const savedUser = await userRepository.findById(user.id);
 
-      expect(savedUser.lastIPAddress).toEqual(ip);
+      expect(savedUser.lastIpAddress).toEqual(ip);
     });
 
     it('should return a token when signing in successfully', async () => {
       const password = '1234';
       const user = await createUser({ password });
-      await user.save();
 
       const { token } = await service.signin(user.email, password, '1.1.1.1');
 

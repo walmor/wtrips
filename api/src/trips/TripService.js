@@ -1,12 +1,10 @@
-import mongoose from 'mongoose';
 import moment from 'moment';
 import { NotFound, BadRequest, Forbidden } from 'http-errors';
 import ensureAuthorized from '../auth/Acl';
 import Trip from './Trip';
-import User from '../users/User';
 import validateAndSanitizeTripData from './TripSchema';
-
-const BASIC_USER_FIELDS = 'name isActive';
+import userRepository from '../users/UserRepository';
+import tripRepository from './TripRepository';
 
 class TripService {
   constructor(user) {
@@ -16,7 +14,11 @@ class TripService {
   async create(tripData) {
     await this.ensureAuthorized('create');
 
-    return this.saveTrip(new Trip(), tripData);
+    const data = await this.getTripData(tripData);
+
+    const trip = await tripRepository.insert(data);
+
+    return trip.toObject();
   }
 
   async update(id, tripData) {
@@ -24,7 +26,11 @@ class TripService {
 
     await this.ensureAuthorized('update', trip);
 
-    return this.saveTrip(trip, tripData);
+    const data = await this.getTripData(tripData);
+
+    const updatedTrip = await tripRepository.update(trip.id, data);
+
+    return updatedTrip.toObject();
   }
 
   async delete(id) {
@@ -32,12 +38,12 @@ class TripService {
 
     await this.ensureAuthorized('delete', trip);
 
-    await Trip.findByIdAndRemove(trip.id);
+    await tripRepository.delete(trip.id);
 
     return {
       success: true,
       message: 'Trip deleted successfully.',
-      tripId: trip._id,
+      tripId: trip.id,
     };
   }
 
@@ -46,102 +52,26 @@ class TripService {
 
     await this.ensureAuthorized('edit', trip);
 
-    await trip.populate({ path: 'user', select: BASIC_USER_FIELDS }).execPopulate();
-
     return trip.toObject();
   }
 
   async list(options) {
     await this.ensureAuthorized('list');
 
-    const opts = this.sanitizeListOpts(options);
+    const opts = await this.sanitizeListOpts(options);
 
-    const skip = (opts.page - 1) * opts.pageSize;
-
-    let conditions = opts.userId ? { user: opts.userId } : {};
-
-    if (opts.search) {
-      const regex = new RegExp(opts.search, 'i');
-      conditions = { $and: [conditions, { $or: [{ destination: regex }, { comment: regex }] }] };
-    }
-
-    // #region First filter. Get trips that are happening within the filter range. Less intuitive.
-    /*
-    if (opts.startDate) {
-      conditions = {
-        $and: [
-          conditions,
-          {
-            $or: [{ startDate: { $gte: opts.startDate } }, { endDate: { $gte: opts.startDate } }],
-          },
-        ],
-      };
-    }
-
-    if (opts.endDate) {
-      conditions = {
-        $and: [
-          conditions,
-          {
-            $or: [{ startDate: { $lte: opts.endDate } }, { endDate: { $lte: opts.endDate } }],
-          },
-        ],
-      };
-    }
-    */
-    // #endregion
-
-    // #region Second filter. Get trips that start within the filter range. More intuitive.
-
-    if (opts.startDate) {
-      conditions = {
-        $and: [conditions, { startDate: { $gte: opts.startDate } }],
-      };
-    }
-
-    if (opts.endDate) {
-      conditions = {
-        $and: [conditions, { startDate: { $lte: opts.endDate } }],
-      };
-    }
-
-    // #endregion
-
-    const totalCount = await Trip.countDocuments(conditions);
-    const tripModels = await Trip.find(conditions, null, {
-      skip,
-      limit: opts.pageSize,
-      sort: { [opts.sortField]: opts.sortOrder },
-    }).populate('user', BASIC_USER_FIELDS);
-
-    const trips = tripModels.map(t => t.toObject());
-
-    return { totalCount, trips };
+    return tripRepository.list(opts);
   }
 
   async getTravelPlan(options) {
     await this.ensureAuthorized('list');
 
     const opts = this.getTravelPlanOpts(options);
-    const { baseDate } = opts;
-    const startDate = baseDate.toDate();
-    const endDate = baseDate.endOf('month').toDate();
 
-    let conditions = opts.userId ? { user: opts.userId } : {};
-
-    conditions = {
-      $and: [conditions, { startDate: { $gte: startDate } }, { startDate: { $lte: endDate } }],
-    };
-
-    const tripModels = await Trip.find(conditions, null, { sort: { startDate: 1 } }).populate(
-      'user',
-      BASIC_USER_FIELDS,
-    );
-
-    return tripModels.map(t => t.toObject());
+    return tripRepository.getTravelPlan(opts);
   }
 
-  sanitizeListOpts(options) {
+  async sanitizeListOpts(options) {
     const opts = options || {};
     const search = opts.search || null;
 
@@ -175,11 +105,13 @@ class TripService {
     // eslint-disable-next-line prefer-const
     let [sortField, sortOrder] = sort.split(':');
 
-    if (Trip.schema.pathType(sortField) === 'adhocOrUndefined') {
+    const tableMetadata = await Trip.fetchTableMetadata();
+
+    if (!tableMetadata.columns.includes(sortField)) {
       throw new BadRequest('The sort field is invalid.');
     }
 
-    sortOrder = sortOrder === 'desc' ? -1 : 1;
+    sortOrder = sortOrder === 'desc' ? 'desc' : 'asc';
 
     const userId = this.sanitizeUserIdFilter(opts);
 
@@ -220,58 +152,58 @@ class TripService {
       throw new BadRequest('The filter date should be greater than the current date.');
     }
 
+    const startDate = baseDate.toDate();
+    const endDate = baseDate.endOf('month').toDate();
+
     const userId = this.sanitizeUserIdFilter(opts);
 
-    return { userId, baseDate };
+    return { userId, startDate, endDate };
   }
 
   sanitizeUserIdFilter(opts) {
     let userId = this.currUser.id;
 
-    if (this.currUser.role === 'admin') {
-      if (opts.userId && !mongoose.Types.ObjectId.isValid(opts.userId)) {
+    if (this.currUser.role === 'admin' && opts.userId) {
+      const optsUserId = parseInt(opts.userId, 10);
+
+      if (!Number.isInteger(optsUserId)) {
         throw new BadRequest('Invalid user id.');
       }
 
-      userId = opts.userId || null;
+      userId = optsUserId || null;
     }
 
     return userId;
   }
 
-  async saveTrip(trip, tripData) {
+  async getTripData(tripData) {
     const data = await validateAndSanitizeTripData(tripData);
-
-    trip.set(data);
 
     if (data.userId) {
       if (this.currUser.role === 'admin') {
-        const user = await User.findById(data.userId);
+        const user = await userRepository.findById(data.userId);
         if (!user) throw new BadRequest('The userId is invalid. User not found.');
 
-        trip.user = data.userId;
+        data.user = user;
       } else {
         throw new Forbidden('Access denied');
       }
     } else {
-      trip.user = this.currUser.id;
+      data.user = this.currUser;
     }
 
-    await trip.save();
-
-    await trip.populate({ path: 'user', select: BASIC_USER_FIELDS }).execPopulate();
-
-    return trip.toObject();
+    return data;
   }
 
   async ensureTripExists(id) {
     const notFound = new NotFound('Trip not found.');
+    const tripId = parseInt(id, 10);
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    if (!Number.isInteger(tripId)) {
       throw notFound;
     }
 
-    const trip = await Trip.findById(id);
+    const trip = await tripRepository.findById(tripId);
 
     if (!trip) {
       throw notFound;

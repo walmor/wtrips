@@ -1,27 +1,26 @@
 import { NotFound, BadRequest, Forbidden } from 'http-errors';
 import moment from 'moment';
-import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
+import testDbManager from '../__tests__/utils/test-db';
 import { createUser, createTrip, createTrips } from '../__tests__/utils/helpers';
 import * as acl from '../auth/Acl';
 import TripService from './TripService';
 
 beforeAll(async () => {
-  await mongodbInMemory.init();
+  await testDbManager.init();
   acl.default = jest.fn(() => true);
 });
 
 afterAll(async () => {
-  await mongodbInMemory.stop();
+  await testDbManager.stop();
 });
 
 beforeEach(async () => {
-  await mongodbInMemory.clearDatabase();
+  await testDbManager.clearDatabase();
   acl.default.mockClear();
 });
 
 async function getServiceWithCurrUsr() {
   const currUser = await createUser();
-  await currUser.save();
 
   const service = new TripService(currUser);
 
@@ -104,12 +103,11 @@ describe('The TripService', () => {
     it('should not allow a regular user create trip for any other user', async () => {
       const { service } = await getServiceWithCurrUsr();
       const user2 = await createUser();
-      await user2.save();
 
       expect.assertions(1);
 
       const tripData = getTripData();
-      tripData.userId = user2._id;
+      tripData.userId = user2.id;
 
       try {
         await service.create(tripData);
@@ -123,21 +121,19 @@ describe('The TripService', () => {
     it('should get an existing trip', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       const foundTrip = await service.get(trip.id);
 
-      expect(foundTrip._id.equals(trip.id)).toBe(true);
+      expect(foundTrip.id).toEqual(trip.id);
     });
 
     it('should return the user id and name', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       const foundTrip = await service.get(trip.id);
 
-      expect(foundTrip.user._id.equals(currUser._id)).toBe(true);
+      expect(foundTrip.user.id).toEqual(currUser.id);
       expect(foundTrip.user.name).toEqual(currUser.name);
     });
 
@@ -152,7 +148,6 @@ describe('The TripService', () => {
     it('should ensure the user is authorized', async () => {
       const { service } = await getServiceWithCurrUsr();
       const trip = await createTrip();
-      await trip.save();
 
       await service.get(trip.id);
 
@@ -173,7 +168,6 @@ describe('The TripService', () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       await service.update(trip.id, trip.toObject());
 
@@ -184,7 +178,6 @@ describe('The TripService', () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       expect.assertions(2);
 
@@ -216,7 +209,6 @@ describe('The TripService', () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       const updatedTrip = await service.update(trip.id, tripData);
 
@@ -239,7 +231,6 @@ describe('The TripService', () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
       await service.delete(trip.id);
 
@@ -249,12 +240,11 @@ describe('The TripService', () => {
     it('should delete a trip id it exists and the user has authorization', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
       const trip = await createTrip({ user: currUser });
-      await trip.save();
 
-      const result = await service.delete(trip._id);
+      const result = await service.delete(trip.id);
 
       expect(result.success).toBe(true);
-      expect(result.tripId).toEqual(trip._id);
+      expect(result.tripId).toEqual(trip.id);
     });
   });
 
@@ -332,8 +322,7 @@ describe('The TripService', () => {
 
       const destination = 'UnitTestLand';
 
-      const trip = await createTrip({ user: currUser, destination });
-      await trip.save();
+      await createTrip({ user: currUser, destination });
 
       await createTrips(10, currUser);
 
@@ -347,8 +336,7 @@ describe('The TripService', () => {
 
       const comment = 'UnitTest Comment';
 
-      const trip = await createTrip({ user: currUser, comment });
-      await trip.save();
+      await createTrip({ user: currUser, comment });
 
       await createTrips(10, currUser);
 
@@ -374,7 +362,7 @@ describe('The TripService', () => {
             .toDate(),
         }),
       );
-      
+
       trips.push(
         await createTrip({
           user: currUser,
@@ -411,7 +399,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await Promise.all(trips.map(t => t.save()));
+      await Promise.all(trips);
 
       const result = await service.list({ startDate: filterDate.toDate() });
 
@@ -461,7 +449,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await Promise.all(trips.map(t => t.save()));
+      await Promise.all(trips);
 
       const result = await service.list({ endDate: filterDate.toDate() });
 
@@ -510,26 +498,25 @@ describe('The TripService', () => {
         }),
       );
 
-      await Promise.all(trips.map(t => t.save()));
+      await Promise.all(trips);
 
       const result = await service.list({ sort: 'startDate:asc' });
 
       expect(result.trips.length).toBe(3);
-      expect(result.trips[0]._id).toEqual(trips[2]._id);
-      expect(result.trips[1]._id).toEqual(trips[1]._id);
-      expect(result.trips[2]._id).toEqual(trips[0]._id);
+      expect(result.trips[0].id).toEqual(trips[2].id);
+      expect(result.trips[1].id).toEqual(trips[1].id);
+      expect(result.trips[2].id).toEqual(trips[0].id);
     });
 
     it('should return the user id and name', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const trip = await createTrip({ user: currUser });
-      await trip.save();
+      await createTrip({ user: currUser });
 
       const result = await service.list();
 
       expect(result.trips[0].user.name).toBe(currUser.name);
-      expect(result.trips[0].user._id.equals(currUser._id)).toBe(true);
+      expect(result.trips[0].user.id).toEqual(currUser.id);
     });
   });
 
@@ -577,7 +564,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await Promise.all(trips.map(t => t.save()));
+      await Promise.all(trips);
 
       const result = await service.getTravelPlan();
 
@@ -630,7 +617,7 @@ describe('The TripService', () => {
         }),
       );
 
-      await Promise.all(trips.map(t => t.save()));
+      await Promise.all(trips);
 
       const result = await service.getTravelPlan({ month: baseDate.month() + 1, year: baseDate.year() });
 
@@ -640,16 +627,14 @@ describe('The TripService', () => {
     it('should return the user id and name', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
 
-      const startDate = moment()        
-        .add(2, 'days');
+      const startDate = moment().add(2, 'days');
 
-      const trip = await createTrip({ startDate, user: currUser });
-      await trip.save();
+      await createTrip({ startDate, user: currUser });
 
       const trips = await service.getTravelPlan();
 
       expect(trips[0].user.name).toBe(currUser.name);
-      expect(trips[0].user._id.equals(currUser._id)).toBe(true);
+      expect(trips[0].user.id).toEqual(currUser.id);
     });
 
     it('should throw BadRequest if the month is invalid', async () => {
