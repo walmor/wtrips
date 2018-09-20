@@ -49,7 +49,7 @@ function getTableColumns(smallWidth, onEdit, onDelete, canManageUserTrips) {
       key: 'destination',
       width: '30%',
       render: (text, trip) => (
-        <LinkButton onClick={() => onEdit(trip._id)}>{trip.destination}</LinkButton>
+        <LinkButton onClick={() => onEdit(trip.id)}>{trip.destination}</LinkButton>
       ),
     },
   ];
@@ -95,8 +95,8 @@ function getTableColumns(smallWidth, onEdit, onDelete, canManageUserTrips) {
   const Actions = observer(({ trip }) => (
     <span>
       {trip.deleting && <Spin indicator={<Icon type="loading" />} size="small" />}
-      {!trip.deleting && <EditListActionButton onClick={() => onEdit(trip._id)} />}
-      {!trip.deleting && <DeleteListActionButton className="DeleteTripActionButton" onConfirm={() => onDelete(trip._id)} />}
+      {!trip.deleting && <EditListActionButton onClick={() => onEdit(trip.id)} />}
+      {!trip.deleting && <DeleteListActionButton className="DeleteTripActionButton" onConfirm={() => onDelete(trip.id)} />}
     </span>
   ));
 
@@ -205,7 +205,7 @@ class TripList extends React.Component {
                 return (
                   <Table
                     size="middle"
-                    rowKey="_id"
+                    rowKey="id"
                     loading={{ delay: 500, spinning: loading }}
                     locale={{ emptyText: 'No trips found' }}
                     pagination={pagination}

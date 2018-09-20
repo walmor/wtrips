@@ -94,7 +94,7 @@ export default class UserStore {
 
     this.userEditing.isEditing = true;
     this.userEditing.user = user;
-    this.userEditing.isCurrentUser = user._id === currentUser._id;
+    this.userEditing.isCurrentUser = user.id === currentUser.id;
   }
 
   @action
@@ -103,7 +103,7 @@ export default class UserStore {
       this.userEditing.error = null;
       this.userEditing.isSaving = true;
 
-      const usr = await this.api.put(USERS_URL + user._id, user);
+      const usr = await this.api.put(USERS_URL + user.id, user);
 
       if (this.userEditing.isCurrentUser) {
         await this.appStore.auth.renewToken();
@@ -200,13 +200,13 @@ export default class UserStore {
 
   @action
   observeUser(user) {
-    let obsUser = this.allUsers.get(user._id);
+    let obsUser = this.allUsers.get(user.id);
 
     if (obsUser) {
       Object.assign(obsUser, user);
     } else {
-      this.allUsers.set(user._id, user);
-      obsUser = this.allUsers.get(user._id);
+      this.allUsers.set(user.id, user);
+      obsUser = this.allUsers.get(user.id);
     }
 
     return obsUser;

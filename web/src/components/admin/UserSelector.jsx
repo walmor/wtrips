@@ -23,7 +23,7 @@ class UserSelector extends Component {
     } = this.props;
 
     const users = toJS(this.props.users);
-    const selectedValue = selectedUser ? selectedUser._id : undefined;
+    const selectedValue = selectedUser ? selectedUser.id : undefined;
 
     return (
       <Select
@@ -38,7 +38,7 @@ class UserSelector extends Component {
         onBlur={onLeave}
       >
         {users.map(u => (
-          <Option key={u._id} value={u._id}>
+          <Option key={u.id} value={u.id}>
             {u.name}
           </Option>
         ))}

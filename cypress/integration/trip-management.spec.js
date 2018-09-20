@@ -39,8 +39,8 @@ function clickOnFirstTrip() {
 
 function tripListItemShouldBeUpdated(alias, destination) {
   cy.get(`@${alias}`).then(xhr => {
-    const { _id } = xhr.responseBody;
-    cy.get(`table tr[data-row-key=${_id}]`)
+    const { id } = xhr.responseBody;
+    cy.get(`table tr[data-row-key=${id}]`)
       .find('td .LinkButton')
       .should('contain', destination);
   });

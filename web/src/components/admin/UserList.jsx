@@ -37,7 +37,7 @@ function getTableColumns(smallWidth, onEdit, roles) {
       dataIndex: 'name',
       key: 'name',
       width: '30%',
-      render: (text, user) => <LinkButton onClick={() => onEdit(user._id)}>{user.name}</LinkButton>,
+      render: (text, user) => <LinkButton onClick={() => onEdit(user.id)}>{user.name}</LinkButton>,
     },
   ];
 
@@ -72,7 +72,7 @@ function getTableColumns(smallWidth, onEdit, roles) {
     title: 'Edit',
     key: 'edit',
     width: smallWidth ? '5%' : '10%',
-    render: (text, user) => <EditListActionButton onClick={() => onEdit(user._id)} />,
+    render: (text, user) => <EditListActionButton onClick={() => onEdit(user.id)} />,
   });
 
   return columns;
@@ -113,7 +113,7 @@ class UserList extends React.Component {
                 return (
                   <Table
                     size="middle"
-                    rowKey="_id"
+                    rowKey="id"
                     loading={{ delay: 500, spinning: loading }}
                     locale={{ emptyText: 'No users found' }}
                     pagination={pagination}

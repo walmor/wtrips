@@ -62,7 +62,7 @@ const TravelPlanTable = ({
     <h1>Travel plan - {date}</h1>
     <Table
       size="middle"
-      rowKey="_id"
+      rowKey="id"
       loading={{ delay: 500, spinning: loading }}
       locale={{ emptyText: 'No trips found' }}
       pagination={false}

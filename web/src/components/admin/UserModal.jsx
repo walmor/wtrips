@@ -91,7 +91,7 @@ class UserModal extends React.Component {
     form.validateFields((error, values) => {
       if (!error) {
         const editedUser = {
-          _id: user._id,
+          id: user.id,
           name: values.name.trim(),
           email: values.email.trim(),
         };

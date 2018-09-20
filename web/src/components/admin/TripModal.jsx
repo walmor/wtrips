@@ -92,7 +92,7 @@ class TripModal extends React.Component {
     form.validateFields((error, values) => {
       if (!error) {
         const editedTrip = {
-          _id: trip._id,
+          id: trip.id,
           destination: values.destination.trim(),
           startDate: values.dateRange[0].toDate(),
           endDate: values.dateRange[1].toDate(),

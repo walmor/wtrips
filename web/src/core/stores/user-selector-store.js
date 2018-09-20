@@ -118,7 +118,7 @@ export default class UserSelectorStore {
     if (
       this.initialUser &&
       !this.searchValue &&
-      !filteredUsers.find(u => u._id === this.initialUser._id)
+      !filteredUsers.find(u => u.id === this.initialUser.id)
     ) {
       this.users.push(this.initialUser);
     }
@@ -130,8 +130,8 @@ export default class UserSelectorStore {
     const { initialUser } = this;
     const { currentUser } = this.appStore.auth;
 
-    if (u._id === currentUser._id) return false;
-    if (initialUser && u._id === initialUser._id) return true;
+    if (u.id === currentUser.id) return false;
+    if (initialUser && u.id === initialUser.id) return true;
     if (this.onlyActiveUsers && !u.isActive) return false;
 
     return true;
