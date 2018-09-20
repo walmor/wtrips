@@ -19,9 +19,10 @@ export default class User extends Model {
   }
 
   async $beforeUpdate(opt, queryContext) {
-    // await super.$beforeUpdate(opt, queryContext);
+    await super.$beforeUpdate(opt, queryContext);
+    const currUser = await User.query().findById(this.id);
 
-    if (this.password && opt.old && this.password !== opt.old.password) {
+    if (this.password && this.password !== currUser.password) {
       await this.hashPassword();
     }
 

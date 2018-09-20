@@ -37,7 +37,9 @@ class UserService {
       throw new Forbidden('A manager user cannot set the user role to admin.');
     }
 
-    const updatedUser = await userRepository.update(user.id, userData);
+    delete data.currentPassword;
+
+    const updatedUser = await userRepository.update(user.id, data);
 
     return updatedUser.toObject();
   }
