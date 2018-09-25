@@ -1,7 +1,8 @@
 import casual from 'casual';
 import moment from 'moment';
-import User from '../../users/User';
-import Trip from '../../trips/Trip';
+import { snakeCase } from 'objection/lib/utils/identifierMapping';
+import userRepository from '../../users/UserRepository';
+import tripRepository from '../../trips/TripRepository';
 
 async function createUser(props) {
   const user = {
@@ -10,10 +11,10 @@ async function createUser(props) {
     role: 'user',
     password: '123456',
     isActive: true,
-    lastIPAddress: '189.100.242.238',
+    lastIpAddress: '189.100.242.238',
   };
 
-  return Promise.resolve(new User(Object.assign(user, props)));
+  return userRepository.insert(Object.assign(user, props));
 }
 
 async function createUsers(qty) {
@@ -22,11 +23,14 @@ async function createUsers(qty) {
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < qty; i++) {
     const user = await createUser();
-    await user.save();
     users.push(user);
   }
 
   return users;
+}
+
+async function updateUser(user) {
+  return userRepository.update(user.id, user);
 }
 
 async function createTrip(props) {
@@ -38,7 +42,6 @@ async function createTrip(props) {
 
   if (!user) {
     user = await createUser();
-    await user.save();
   }
 
   const trip = {
@@ -46,10 +49,10 @@ async function createTrip(props) {
     startDate: new Date('2019-01-01'),
     endDate: new Date('2019-02-01'),
     comment: casual.short_description,
-    user: user.id,
+    user,
   };
 
-  return new Trip(Object.assign(trip, props));
+  return tripRepository.insert(Object.assign(trip, props));
 }
 
 async function createTrips(qty, user) {
@@ -75,24 +78,27 @@ async function createTrips(qty, user) {
     trips.push(tripData);
   }
 
-  return Promise.all(trips.map(async trip => (await createTrip(trip)).save()));
+  return Promise.all(trips.map(async trip => createTrip(trip)));
+}
+
+async function updateTrip(trip) {
+  return tripRepository.update(trip.id, trip);
 }
 
 function testRequiredProperty(createModel) {
-  return async (propName) => {
+  return async (propName, columnName) => {
     expect.assertions(2);
 
-    const model = await createModel({ [propName]: null });
-
     try {
-      await model.save();
+      await createModel({ [propName]: null });
     } catch (error) {
-      expect(error.errors[propName]).toBeDefined();
-      expect(error.errors[propName].kind).toBe('required');
+      const cn = columnName || snakeCase(propName);
+      expect(error.column).toEqual(cn);
+      expect(error.code).toEqual('23502');
     }
   };
 }
 
 export {
-  createUser, createUsers, createTrip, createTrips, testRequiredProperty,
+  createUser, createUsers, updateUser, createTrip, createTrips, updateTrip, testRequiredProperty,
 };

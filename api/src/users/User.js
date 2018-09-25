@@ -1,90 +1,63 @@
-import mongoose, { Schema } from 'mongoose';
+import { Model } from 'objection';
 import bcrypt from 'bcrypt';
-import isEmail from 'validator/lib/isEmail';
-import isIP from 'validator/lib/isIP';
 import moment from 'moment';
 
-const userSchema = new Schema({
-  name: { type: String, required: true },
-  email: {
-    type: String,
-    unique: true,
-    index: true,
-    required: true,
-    lowercase: true,
-    validate: {
-      validator: isEmail,
-      message: 'Invalid email.',
-    },
-  },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['user', 'manager', 'admin'] },
-  isActive: { type: Boolean, default: true },
-  createdAt: {
-    type: Date,
-    set(val) {
-      return this.createdAt || val;
-    },
-  },
-  updatedAt: Date,
-  lastIPAddress: {
-    type: String,
-    required: true,
-    validate: {
-      validator: val => isIP(val),
-      message: 'Invalid IP address.',
-    },
-  },
-  resetPasswordToken: String,
-  resetPasswordExpiresAt: Date,
-});
+export default class User extends Model {
+  static get tableName() {
+    return 'app_user';
+  }
 
-userSchema.set('toObject', {
-  versionKey: false,
-  transform(doc, ret) {
-    delete ret.password;
-    delete ret.lastIPAddress;
-    delete ret.resetPasswordToken;
-    delete ret.resetPasswordExpiresAt;
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
 
-    return ret;
-  },
-});
-
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    const saltRounds = 9;
     if (this.password) {
-      this.password = await bcrypt.hash(this.password, saltRounds);
+      await this.hashPassword();
     }
+
+    this.createdAt = moment().toDate();
+    this.updatedAt = this.createdAt;
   }
 
-  const now = moment().toDate();
+  async $beforeUpdate(opt, queryContext) {
+    await super.$beforeUpdate(opt, queryContext);
+    const currUser = await User.query().findById(this.id);
 
-  if (this.isNew) {
-    this.createdAt = now;
+    if (this.password && this.password !== currUser.password) {
+      await this.hashPassword();
+    }
+
+    delete this.createdAt;
+
+    this.updatedAt = moment().toDate();
   }
 
-  this.updatedAt = now;
-
-  next();
-});
-
-userSchema.methods.comparePassword = async function (password) {
-  if (!this.password) {
-    return false;
+  async hashPassword() {
+    const saltRounds = 9;
+    this.password = await bcrypt.hash(this.password, saltRounds);
   }
-  return bcrypt.compare(password, this.password);
-};
 
-userSchema.methods.getRoleId = function () {
-  return this.role;
-};
+  async comparePassword(password) {
+    if (!this.password) {
+      return false;
+    }
+    return bcrypt.compare(password, this.password);
+  }
 
-userSchema.methods.getResourceId = function () {
-  return 'user';
-};
+  getRoleId() {
+    return this.role;
+  }
 
-const User = mongoose.model('User', userSchema);
+  getResourceId() {
+    return 'user';
+  }
 
-export default User;
+  toObject() {
+    const obj = this.toJSON();
+    delete obj.password;
+    delete obj.lastIpAddress;
+    delete obj.resetPasswordToken;
+    delete obj.resetPasswordExpiresAt;
+
+    return obj;
+  }
+}

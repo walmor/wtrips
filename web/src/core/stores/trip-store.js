@@ -37,7 +37,7 @@ export default class TripStore {
     this.userSelector = new UserSelectorStore(appStore);
     this.userSelector.placeholder = 'Filter by user';
     this.userSelector.onUserSelected = (user) => {
-      this.filter({ user: user._id });
+      this.filter({ user: user.id });
     };
 
     this.init();
@@ -121,7 +121,7 @@ export default class TripStore {
 
     this.editing.trip = trip;
 
-    trip.belongsToCurrUser = trip.user._id === currentUser._id;
+    trip.belongsToCurrUser = trip.user.id === currentUser.id;
 
     if (trip.belongsToCurrUser) {
       this.editing.userSelector.setInitialUser(null);
@@ -138,15 +138,15 @@ export default class TripStore {
       this.editing.error = null;
       this.editing.isSaving = true;
 
-      const userId = trip.user ? trip.user._id : undefined;
+      const userId = trip.user ? trip.user.id : undefined;
       const tripData = { ...trip, userId };
       let savedTrip = null;
-      const isNewTrip = !trip._id;
+      const isNewTrip = !trip.id;
 
       if (isNewTrip) {
         savedTrip = await this.api.post(TRIPS_URL, tripData);
       } else {
-        savedTrip = await this.api.put(TRIPS_URL + trip._id, tripData);
+        savedTrip = await this.api.put(TRIPS_URL + trip.id, tripData);
       }
 
       runInAction(() => {
@@ -248,13 +248,13 @@ export default class TripStore {
 
   @action
   observeTrip(trip) {
-    let obsTrip = this.allTrips.get(trip._id);
+    let obsTrip = this.allTrips.get(trip.id);
 
     if (obsTrip) {
       Object.assign(obsTrip, trip);
     } else {
-      this.allTrips.set(trip._id, trip);
-      obsTrip = this.allTrips.get(trip._id);
+      this.allTrips.set(trip.id, trip);
+      obsTrip = this.allTrips.get(trip.id);
     }
 
     obsTrip.user = this.appStore.users.observeUser(trip.user);
@@ -314,7 +314,7 @@ export default class TripStore {
       this.query.userId = null;
     } else if (qs.user === 'me') {
       const { currentUser } = this.appStore.auth;
-      this.query.userId = currentUser._id;
+      this.query.userId = currentUser.id;
     } else {
       this.query.userId = qs.user;
     }
@@ -333,7 +333,7 @@ export default class TripStore {
         this.userSelector.selectedUser = null;
       } else {
         const { allUsers } = this.appStore.users;
-        this.userSelector.selectedUser = allUsers.get(qsuser);
+        this.userSelector.selectedUser = allUsers.get(parseInt(qsuser, 10));
       }
     }
   }

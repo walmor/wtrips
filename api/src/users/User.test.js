@@ -1,16 +1,16 @@
-import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
-import { createUser, testRequiredProperty } from '../__tests__/utils/helpers';
+import testDbManager from '../__tests__/utils/test-db';
+import { createUser, updateUser, testRequiredProperty } from '../__tests__/utils/helpers';
 
 beforeAll(async () => {
-  await mongodbInMemory.init();
+  await testDbManager.init();
 });
 
 afterAll(async () => {
-  await mongodbInMemory.stop();
+  await testDbManager.stop();
 });
 
-beforeEach(async () => {
-  await mongodbInMemory.clearDatabase();
+afterEach(async () => {
+  await testDbManager.clearDatabase();
 });
 
 const testUserRequiredProperty = testRequiredProperty(createUser);
@@ -24,34 +24,18 @@ describe('The user', async () => {
     await testUserRequiredProperty('email');
   });
 
-  it('should not be saved with an invalid email', async () => {
-    expect.assertions(2);
-
-    const user = await createUser({ email: 'invalid-email' });
-
-    try {
-      await user.save();
-    } catch (error) {
-      expect(error.errors.email).toBeDefined();
-      expect(error.errors.email.kind).toBe('user defined');
-    }
-  });
-
   it('should not be saved if the email already exists', async () => {
     expect.assertions(2);
     const email = 'test@example.com';
 
-    const user1 = await createUser({ email });
-    const user2 = await createUser({ email });
-
-    await user1.save();
+    await createUser({ email });
 
     try {
-      await user2.save();
+      await createUser({ email });
     } catch (error) {
-      const duplicateKeyErrorCode = 11000;
+      const duplicateKeyErrorCode = '23505';
       expect(error.code).toBe(duplicateKeyErrorCode);
-      expect(error.message).toContain(email);
+      expect(error.detail).toContain(email);
     }
   });
 
@@ -60,25 +44,11 @@ describe('The user', async () => {
   });
 
   it('should not be saved without an IP address', async () => {
-    await testUserRequiredProperty('lastIPAddress');
-  });
-
-  it('should not be saved with an invalid IP address', async () => {
-    expect.assertions(2);
-
-    const user = await createUser({ lastIPAddress: 'invalid-ip-address' });
-
-    try {
-      await user.save();
-    } catch (error) {
-      expect(error.errors.lastIPAddress).toBeDefined();
-      expect(error.errors.lastIPAddress.kind).toBe('user defined');
-    }
+    await testUserRequiredProperty('lastIpAddress');
   });
 
   it('should be saved with a creation and update date', async () => {
     const user = await createUser();
-    await user.save();
 
     expect(user.createdAt).toBeTruthy();
     expect(user.createdAt).toBeInstanceOf(Date);
@@ -87,48 +57,43 @@ describe('The user', async () => {
 
   it('should have its update date updated', async () => {
     const user = await createUser();
-    await user.save();
     const { updatedAt } = user;
-    await user.save();
+    await updateUser(user);
 
     expect(user.updatedAt).not.toEqual(updatedAt);
   });
 
   it('should not have its creation date updated', async () => {
     const user = await createUser();
-    const savedUser = await user.save();
-    const { createdAt } = savedUser;
+    const { createdAt } = user;
 
     const testDate = new Date();
     testDate.setMonth((testDate.getMonth() + 1) % 12);
 
-    savedUser.createdAt = testDate;
-    await savedUser.save();
+    user.createdAt = testDate;
+    const updatedUser = await updateUser(user);
 
-    expect(savedUser.createdAt).toEqual(createdAt);
+    expect(updatedUser.createdAt).toEqual(createdAt);
   });
 
   it('should be saved with encrypted password', async () => {
     const password = '123456';
     const user = await createUser({ password });
-    const savedUser = await user.save();
 
-    expect(savedUser.password).not.toBeFalsy();
-    expect(savedUser.password).not.toEqual(password);
+    expect(user.password).not.toBeFalsy();
+    expect(user.password).not.toEqual(password);
   });
 
   it('should be saved when is valid', async () => {
     const user = await createUser();
-    await user.save();
     expect(user.id).toBeTruthy();
   });
 
   it('should be able to compare passwords', async () => {
     const password = '123456';
     const user = await createUser({ password });
-    const savedUser = await user.save();
 
-    expect(await savedUser.comparePassword(password)).toBe(true);
-    expect(await savedUser.comparePassword('any-other-pwd')).toBe(false);
+    expect(await user.comparePassword(password)).toBe(true);
+    expect(await user.comparePassword('any-other-pwd')).toBe(false);
   });
 });

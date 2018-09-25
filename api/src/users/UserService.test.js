@@ -1,26 +1,25 @@
 import { Forbidden, NotFound, BadRequest } from 'http-errors';
-import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
+import testDbManager from '../__tests__/utils/test-db';
 import * as acl from '../auth/Acl';
 import { createUser, createUsers } from '../__tests__/utils/helpers';
 import UserService from './UserService';
 
 beforeAll(async () => {
-  await mongodbInMemory.init();
+  await testDbManager.init();
   acl.default = jest.fn(() => true);
 });
 
 afterAll(async () => {
-  await mongodbInMemory.stop();
+  await testDbManager.stop();
 });
 
 beforeEach(async () => {
-  await mongodbInMemory.clearDatabase();
+  await testDbManager.clearDatabase();
   acl.default.mockClear();
 });
 
 async function getServiceWithCurrUsr(userProps) {
   const currUser = await createUser(userProps);
-  await currUser.save();
 
   const service = new UserService(currUser);
 
@@ -34,7 +33,7 @@ describe('The UserService', () => {
 
       const foundUser = await service.get(currUser.id);
 
-      expect(foundUser._id.equals(currUser.id)).toBe(true);
+      expect(foundUser.id).toEqual(currUser.id);
     });
 
     it('should throw NotFound if the user doesnt exist', async () => {
@@ -103,7 +102,6 @@ describe('The UserService', () => {
     it('should not allow change the email if it already exists', async () => {
       const { currUser, service } = await getServiceWithCurrUsr();
       const user2 = await createUser({ email: 'user2@example.com' });
-      await user2.save();
 
       const udpate = service.update(currUser.id, { email: user2.email });
 
@@ -138,7 +136,6 @@ describe('The UserService', () => {
     it('should not allow a manager to change the user role to admin', async () => {
       const { service } = await getServiceWithCurrUsr({ role: 'manager' });
       const usr = await createUser({ role: 'user' });
-      await usr.save();
 
       const userData = {
         name: usr.name,
@@ -146,7 +143,7 @@ describe('The UserService', () => {
         role: 'admin',
       };
 
-      const udpate = service.update(usr._id, userData);
+      const udpate = service.update(usr.id, userData);
 
       await expect(udpate).rejects.toThrowError(Forbidden);
     });
@@ -213,8 +210,7 @@ describe('The UserService', () => {
       const name = 'Peter McClain UnitTest';
       const email = 'peter-mcclain@example.com';
 
-      const user = await createUser({ name, email });
-      await user.save();
+      await createUser({ name, email });
 
       await createUsers(10);
 
@@ -225,12 +221,11 @@ describe('The UserService', () => {
       expect(result.users.length).toBe(1);
     });
 
-    it('should search by name', async () => {
+    it('should search by email', async () => {
       const name = 'Peter McClain UnitTest';
       const email = 'peter-mcclain-unittest@example.com';
 
-      const user = await createUser({ name, email });
-      await user.save();
+      await createUser({ name, email });
 
       await createUsers(10);
 
@@ -244,11 +239,9 @@ describe('The UserService', () => {
     it('shoult not return admin users when the current user is manager', async () => {
       const { service } = await getServiceWithCurrUsr({ role: 'manager' });
 
-      const adm = await createUser({ role: 'admin' });
-      await adm.save();
+      await createUser({ role: 'admin' });
 
-      const usr = await createUser({ role: 'user' });
-      await usr.save();
+      await createUser({ role: 'user' });
 
       const result = await service.list();
 

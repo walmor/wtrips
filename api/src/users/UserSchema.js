@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import xss from 'xss';
 import { BadRequest } from 'http-errors';
-import User from './User';
+import userRepository from './UserRepository';
 
 const sanitize = new xss.FilterXSS({
   whiteList: [],
@@ -25,17 +25,9 @@ const email = yup
 
 const emailUniqueMessage = 'This email is already in use.';
 
-async function isEmailUnique(value, _id) {
-  let where = { email: value };
-
-  if (_id) {
-    where = {
-      $and: [where, { _id: { $ne: _id } }],
-    };
-  }
-
-  const found = await User.findOne(where);
-  return !found;
+async function isEmailUnique(value, id) {
+  if (!value) return Promise.resolve(true);
+  return userRepository.isEmailAvailable(value, id);
 }
 
 const password = yup.string().min(4);
@@ -53,10 +45,10 @@ const createUserSchema = yup.object().shape({
 });
 
 const updateUserSchema = yup.object().shape({
-  _id: yup.string(),
+  id: yup.number(),
   name,
   email: email.test('unique-email', emailUniqueMessage, async function (value) {
-    return isEmailUnique(value, this.parent._id);
+    return isEmailUnique(value, this.parent.id);
   }),
   password,
   currentPassword: yup.string().when('password', {

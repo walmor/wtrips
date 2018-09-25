@@ -1,55 +1,61 @@
-import mongoose, { Schema } from 'mongoose';
+import { Model } from 'objection';
 import moment from 'moment';
+import User from '../users/User';
 
-const tripSchema = new Schema({
-  destination: { type: String, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  comment: String,
-  createdAt: {
-    type: Date,
-    set(val) {
-      return this.createdAt || val;
-    },
-  },
-  updatedAt: Date,
-});
-
-tripSchema.virtual('daysLeft').get(function () {
-  const today = moment().startOf('day');
-  const startDate = moment(this.startDate);
-
-  const diff = startDate.diff(today, 'days');
-
-  return diff >= 0 ? diff : null;
-});
-
-tripSchema.set('toObject', {
-  virtuals: true,
-  versionKey: false,
-  transform(doc, ret) {
-    delete ret.id;
-    return ret;
-  },
-});
-
-tripSchema.methods.getResourceId = function () {
-  return 'trip';
-};
-
-tripSchema.pre('save', async function (next) {
-  const now = moment().toDate();
-
-  if (this.isNew) {
-    this.createdAt = now;
+export default class Trip extends Model {
+  static get tableName() {
+    return 'trip';
   }
 
-  this.updatedAt = now;
+  static get virtualAttributes() {
+    return ['daysLeft'];
+  }
 
-  next();
-});
+  static get relationMappings() {
+    return {
+      user: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: User,
+        filter: query => query.select('id', 'name'),
+        join: {
+          from: 'trip.user_id',
+          to: 'app_user.id',
+        },
+      },
+    };
+  }
 
-const Trip = mongoose.model('Trip', tripSchema);
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
 
-export default Trip;
+    this.createdAt = moment().toDate();
+    this.updatedAt = this.createdAt;
+  }
+
+  async $beforeUpdate(opt, queryContext) {
+    await super.$beforeUpdate(opt, queryContext);
+
+    delete this.createdAt;
+
+    this.updatedAt = moment().toDate();
+  }
+
+  getResourceId() {
+    return 'trip';
+  }
+
+  toObject() {
+    const obj = this.toJSON();
+    delete obj.userId;
+    return obj;
+  }
+
+  get daysLeft() {
+    const today = moment().startOf('day');
+    const startDate = moment(this.startDate);
+
+    const diff = startDate.diff(today, 'days');
+
+    return diff >= 0 ? diff : null;
+  }
+}

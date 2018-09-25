@@ -1,22 +1,22 @@
 import moment from 'moment';
-import * as mongodbInMemory from '../__tests__/utils/mongodb-in-memory';
-import { createTrip, testRequiredProperty } from '../__tests__/utils/helpers';
+import testDbManager from '../__tests__/utils/test-db';
+import { createTrip, updateTrip, testRequiredProperty } from '../__tests__/utils/helpers';
 
 beforeAll(async () => {
-  await mongodbInMemory.init();
+  await testDbManager.init();
 });
 
 afterAll(async () => {
-  await mongodbInMemory.stop();
+  await testDbManager.stop();
 });
 
 beforeEach(async () => {
-  await mongodbInMemory.clearDatabase();
+  await testDbManager.clearDatabase();
 });
 
 const testTripRequiredProperty = testRequiredProperty(createTrip);
 
-describe('The trip', () => {
+describe('The trip', async () => {
   it('should not be saved without a destination', async () => {
     await testTripRequiredProperty('destination');
   });
@@ -30,12 +30,11 @@ describe('The trip', () => {
   });
 
   it('should not be saved if it is not assign to an user', async () => {
-    await testTripRequiredProperty('user');
+    await testTripRequiredProperty('user', 'user_id');
   });
 
   it('should be saved with a creation and update date', async () => {
     const trip = await createTrip();
-    await trip.save();
 
     expect(trip.createdAt).toBeTruthy();
     expect(trip.createdAt).toBeInstanceOf(Date);
@@ -44,31 +43,29 @@ describe('The trip', () => {
 
   it('should have its update date updated', async () => {
     const trip = await createTrip();
-    await trip.save();
     const { updatedAt } = trip;
-    await trip.save();
+    delete trip.user_id;
+    await updateTrip(trip);
 
     expect(trip.updatedAt).not.toEqual(updatedAt);
   });
 
   it('should not have its creation date updated', async () => {
     const trip = await createTrip();
-    await trip.save();
     const { createdAt } = trip;
 
     const testDate = new Date();
     testDate.setMonth((testDate.getMonth() + 1) % 12);
 
     trip.createdAt = testDate;
-    await trip.save();
+    delete trip.user_id;
+    const updatedTrip = await updateTrip(trip);
 
-    expect(trip.createdAt).toEqual(createdAt);
+    expect(updatedTrip.createdAt).toEqual(createdAt);
   });
 
   it('should be saved when is valid', async () => {
     const trip = await createTrip();
-
-    await trip.save();
 
     expect(trip.id).toBeTruthy();
   });

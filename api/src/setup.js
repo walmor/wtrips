@@ -1,12 +1,12 @@
-import User from './users/User';
 import AuthService from './auth/AuthService';
 import UserService from './users/UserService';
 import TripService from './trips/TripService';
+import userRepository from './users/UserRepository';
 
 async function setCurrentUser(req) {
   if (req.auth && req.auth.user) {
-    const userId = req.auth.user._id;
-    req.user = await User.findById(userId);
+    const userId = req.auth.user.id;
+    req.user = await userRepository.findById(userId);
   }
 }
 

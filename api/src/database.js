@@ -1,16 +1,21 @@
-import mongoose from 'mongoose';
+import initKnex from 'knex';
+import { Model } from 'objection';
 import config from './config';
 
-export default async function startDatabase() {
-  const { db } = config;
-  const uri = `mongodb://${db.user}:${db.password}@${db.host}:${db.port}/${db.name}?authSource=${db.authSource}`;
+let knex = null;
 
-  return mongoose.connect(
-    uri,
-    { useNewUrlParser: true },
-  );
+export default async function startDatabase() {
+  return new Promise((resolve, reject) => {
+    try {
+      knex = initKnex(config.knex);
+      Model.knex(knex);
+      resolve();
+    } catch (err) {
+      reject(err);
+    }
+  });
 }
 
 export async function diconnectDatabase() {
-  return mongoose.disconnect();
+  return knex.destroy();
 }

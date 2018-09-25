@@ -22,7 +22,7 @@ acl.allow('user', 'trip', ['create', 'list']);
 acl.allow('user', 'trip', ['edit', 'update', 'delete'], (err, role, resource, action, result, next) => {
   if (!(role instanceof User) || !(resource instanceof Trip)) return next();
 
-  if (role._id.equals(resource.user._id)) {
+  if (role.id === resource.user.id) {
     return result(null, true);
   }
 
@@ -32,7 +32,7 @@ acl.allow('user', 'trip', ['edit', 'update', 'delete'], (err, role, resource, ac
 acl.allow('user', 'user', ['edit', 'update'], (err, role, resource, action, result, next) => {
   if (!(role instanceof User) || !(resource instanceof User)) return next();
 
-  if (role._id.equals(resource._id)) {
+  if (role.id === resource.id) {
     return result(null, true);
   }
 

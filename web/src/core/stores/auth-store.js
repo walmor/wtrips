@@ -65,7 +65,7 @@ class AuthStore {
 
   @action
   editProfile() {
-    this.appStore.users.editUser(this.currentUser._id);
+    this.appStore.users.editUser(this.currentUser.id);
   }
 
   async isEmailAvailable(email) {

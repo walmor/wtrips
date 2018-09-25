@@ -28,7 +28,7 @@ export default class TravelPlanStore {
     this.userSelector = new UserSelectorStore(appStore);
     this.userSelector.placeholder = 'Filter by user';
     this.userSelector.onUserSelected = (user) => {
-      this.filter({ user: user._id });
+      this.filter({ user: user.id });
     };
 
     this.init();
@@ -155,7 +155,7 @@ export default class TravelPlanStore {
       this.query.userId = null;
     } else if (qs.user === 'me') {
       const { currentUser } = this.appStore.auth;
-      this.query.userId = currentUser._id;
+      this.query.userId = currentUser.id;
     } else {
       this.query.userId = qs.user;
     }
@@ -174,7 +174,7 @@ export default class TravelPlanStore {
         this.userSelector.selectedUser = null;
       } else {
         const { allUsers } = this.appStore.users;
-        this.userSelector.selectedUser = allUsers.get(qsuser);
+        this.userSelector.selectedUser = allUsers.get(parseInt(qsuser, 10));
       }
     }
   }
