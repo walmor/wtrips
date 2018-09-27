@@ -4,13 +4,10 @@
   "description": "wTrips project",
   "main": "index.js",
   "scripts": {
-    "test": "cd ./api && yarn test",
-    "start-api": "cd ./api && yarn start",
-    "start-web": "cd ./web && yarn start",
-    "seed-db": "cd ./api && yarn seed-db",
-    "start": "concurrently \"yarn start-api\" \"yarn start-web\"",
-    "start-e2e": "NODE_ENV=e2e yarn start",
-    "cypress": "cypress open"
+    "cypress": "cypress open",
+    "dc:dev": "cd ./docker/dev && docker-compose",
+    "dc:test": "cd ./docker/test && docker-compose",
+    "dc:test:run-test": "yarn dc:test run api yarn test"
   },
   "author": "Walmor Moreira",
   "license": "ISC",

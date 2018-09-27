@@ -1,5 +1,27 @@
 version: '3'
 services:
+  web:
+    image: wtrips-web:dev
+    build:
+      context: ../../web/
+      dockerfile: ./docker/dev/Dockerfile
+    environment:
+      - REACT_APP_API_ENDPOINT=${API_HOST}:${API_PORT}/api
+      - PORT=${WEB_PORT}
+    env_file:
+      - .env
+    volumes:
+      - ../../:/app
+      - /app/web/node_modules
+    expose:
+      - '${WEB_PORT}'
+    ports:
+      - '${WEB_PORT}:${WEB_PORT}'
+    depends_on:
+      - api
+    stdin_open: true
+    tty: true
+
   api:
     image: wtrips-api:dev
     build:
@@ -10,8 +32,10 @@ services:
     volumes:
       - ../../:/app
       - /app/api/node_modules
+    expose:
+      - '${API_PORT}'
     ports:
-      - '${APP_PORT}:${APP_PORT}'
+      - '${API_PORT}:${API_PORT}'
     links:
       - postgres
     depends_on:

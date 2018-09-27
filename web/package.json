@@ -2,7 +2,6 @@
   "name": "wtrips-web",
   "version": "1.0.0",
   "private": true,
-  "proxy": "http://localhost:3443",
   "dependencies": {
     "antd": "^3.5.0",
     "axios": "^0.18.0",

@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { message } from 'antd';
+import config from './config';
 import ApiClientError from './api-client-error';
 
-const BASE_ENDPOINT = '/api';
+const BASE_ENDPOINT = config.apiBaseEndPoint;
 
 class ApiClient {
   constructor() {

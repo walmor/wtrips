@@ -6,7 +6,6 @@ WORKDIR /app/api
 
 COPY package.json yarn.lock ./
 
-RUN yarn global add wait-on
 RUN yarn install && npm rebuild bcrypt --build-from-source && yarn cache clean
 
-EXPOSE 3443 9229 9230
+EXPOSE 9229 9230
