@@ -1,0 +1,31 @@
+version: '3'
+services:
+  api:
+    image: wtrips-api:dev
+    build:
+      context: ../../api/
+      dockerfile: ./docker/dev/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ../../:/app
+      - /app/api/node_modules
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    stdin_open: true
+    tty: true
+
+  postgres:
+    image: postgres:10.5-alpine
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data: {}

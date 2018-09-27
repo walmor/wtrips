@@ -11,7 +11,8 @@
     "knex": "babel-node ./node_modules/knex/bin/cli.js",
     "mig:make": "yarn knex migrate:make",
     "mig:latest": "yarn knex migrate:latest",
-    "mig:rollback": "yarn knex migrate:rollback"
+    "mig:rollback": "yarn knex migrate:rollback",
+    "mig:checkdb": "(yarn knex migrate:currentVersion | grep none) && yarn mig:latest || :"
   },
   "author": "Walmor Moreira",
   "license": "ISC",

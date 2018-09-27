@@ -1,11 +1,11 @@
-import dotenv from 'dotenv';
+// import dotenv from 'dotenv';
 import _ from 'lodash';
 import path from 'path';
 import { knexSnakeCaseMappers } from 'objection';
 
-const env = process.env.NODE_ENV || 'dev';
+// const env = process.env.NODE_ENV || 'dev';
 
-dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
+// dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
 
 const schema = {
   app: {
@@ -33,28 +33,29 @@ const schema = {
 };
 
 // Default configurations
-const defaults = {
-  // dev environment
-  dev: {
-    knex: {
-      connection: {
-        host: 'localhost',
-        database: 'wtrips_dev',
-      },
-    },
-  },
+// const defaults = {
+//   // dev environment
+//   dev: {
+//     knex: {
+//       connection: {
+//         host: 'localhost',
+//         database: 'wtrips_dev',
+//       },
+//     },
+//   },
 
-  // test environment
-  test: {
-    knex: {
-      connection: {
-        host: 'localhost',
-        database: 'wtrips_test',
-      },
-    },
-  },
-};
+//   // test environment
+//   test: {
+//     knex: {
+//       connection: {
+//         host: 'localhost',
+//         database: 'wtrips_test',
+//       },
+//     },
+//   },
+// };
 
-const config = _.merge({}, defaults[env], schema);
+// const config = _.merge({}, defaults[env], schema);
+const config = _.merge({}, schema);
 
 export default config;

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  api:
+    environment:
+      - NODE_ENV=dev
+    command: [sh, -c, 'wait-on -t 15 tcp:${DB_HOST}:${DB_PORT} && yarn mig:seed-db && node']
+  postgres:
+    ports:
+      - '5433:${DB_PORT}'
