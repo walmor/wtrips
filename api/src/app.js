@@ -14,7 +14,14 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(jwt({ secret: config.jwt.secret, requestProperty: 'auth' }).unless({ path: [/^\/api\/auth\/(sign|email)/] }));
+// prettier-ignore
+const whitelist = [
+  /\/auth\/sign(in|up)$/,
+  /\/auth\/email-available$/,
+  /\/tests\/seed-db$/,
+];
+
+app.use(jwt({ secret: config.jwt.secret, requestProperty: 'auth' }).unless({ path: whitelist }));
 
 app.use(setupRequest);
 

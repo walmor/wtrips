@@ -1,7 +1,3 @@
-const rewireMobX = require('react-app-rewire-mobx');
+const { override, addDecoratorsLegacy, disableEsLint } = require('customize-cra');
 
-module.exports = function override(config, env) {
-  // eslint-disable-next-line no-param-reassign
-  config = rewireMobX(config, env);
-  return config;
-};
+module.exports = override(addDecoratorsLegacy(), disableEsLint());

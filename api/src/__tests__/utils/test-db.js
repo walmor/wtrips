@@ -3,6 +3,7 @@ import { Model } from 'objection';
 import { merge } from 'lodash';
 import knexCleaner from 'knex-cleaner';
 import config from '../../config';
+import { createUser, createUsers, createTrips } from './helpers';
 
 async function createDatabaseIfNotExists() {
   const { database } = config.knex.connection;
@@ -32,7 +33,7 @@ const testDbManager = {
   async init() {
     await createDatabaseIfNotExists();
     await this.clearDatabase();
-    return this.db.migrate.latest();
+    return this.migrate();
   },
 
   async clearDatabase() {
@@ -42,21 +43,40 @@ const testDbManager = {
     });
   },
 
+  async migrate() {
+    return this.db.migrate.latest();
+  },
+
+  async seedDatabase() {
+    const admin = await createUser({
+      name: 'Admin',
+      email: 'admin@example.com',
+      role: 'admin',
+    });
+
+    const user = await createUser({
+      name: 'User',
+      email: 'user@example.com',
+      role: 'user',
+    });
+
+    const manager = await createUser({
+      name: 'Manager',
+      email: 'manager@example.com',
+      role: 'manager',
+    });
+
+    const users = [admin, user, manager];
+
+    const randomUsers = await createUsers(2);
+    users.push(...randomUsers);
+
+    return Promise.all(users.map(usr => createTrips(20, usr)));
+  },
+
   async stop() {
     return this.db.destroy();
   },
 };
-
-// testDbManager
-//   .init()
-//   .then((res) => {
-//     console.log('finish', res);
-//   })
-//   .catch((err) => {
-//     console.error(err);
-//   })
-//   .finally(() => {
-//     testDbManager.stop();
-//   });
 
 export default testDbManager;

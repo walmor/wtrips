@@ -1,5 +1,14 @@
-version: '3'
+version: '3.7'
+
+x-node_env: &node_env
+  NODE_ENV: test
+
 services:
-  postgres:
-    ports:
-      - '5434:${DB_PORT}'
+  web:
+    environment: *node_env
+
+  api:
+    environment: *node_env
+
+  end2end:
+    environment: *node_env

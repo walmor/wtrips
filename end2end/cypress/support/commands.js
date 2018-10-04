@@ -9,7 +9,7 @@
 // ***********************************************
 
 Cypress.Commands.add('seedDatabase', () => {
-  cy.exec('yarn seed-db');
+  cy.request('POST', '/api/tests/seed-db');
 });
 
 Cypress.Commands.add('signIn', role => {

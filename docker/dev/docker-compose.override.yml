@@ -1,9 +1,16 @@
-version: '3'
+version: '3.7'
+
+x-node_env: &node_env
+  NODE_ENV: dev
+
 services:
   web:
-    command: yarn start
+    environment: *node_env
+
   api:
+    environment: *node_env
     command: [sh, -c, 'yarn mig:checkdb && yarn start']
-  postgres:
-    ports:
-      - '5433:${DB_PORT}'
+
+  end2end:
+    environment: *node_env
+    image: scratch

@@ -4,15 +4,10 @@
   "description": "wTrips project",
   "main": "index.js",
   "scripts": {
-    "cypress": "cypress open",
     "dc:dev": "cd ./docker/dev && docker-compose",
     "dc:test": "cd ./docker/test && docker-compose",
     "dc:test:run-test": "yarn dc:test run api yarn test"
   },
   "author": "Walmor Moreira",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^3.6.1",
-    "cypress": "^3.1.0"
-  }
+  "license": "ISC"
 }

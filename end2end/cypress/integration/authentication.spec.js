@@ -37,6 +37,18 @@ context('Authentication', () => {
     assertUserIsSignedIn(cy.wait('@signin'));
   });
 
+  specify('An user should be able to sign out', () => {
+    cy.signIn('user');
+
+    cy.signOut();
+
+    cy.location('pathname').should('eq', '/signin');
+
+    cy.should(() => {
+      expect(localStorage.getItem(AUTH_TOKEN_KEY), 'Auth token should be null').to.be.null;
+    });
+  });
+
   specify('An user should be able to sign up', () => {
     const name = 'John';
     const email = 'newuser@example.com';
@@ -62,17 +74,5 @@ context('Authentication', () => {
       .type('{enter}');
 
     assertUserIsSignedIn(cy.wait('@signup'));
-  });
-
-  specify('An user should be able to sign out', () => {
-    cy.signIn('user');
-
-    cy.signOut();
-
-    cy.location('pathname').should('eq', '/signin');
-
-    cy.should(() => {
-      expect(localStorage.getItem(AUTH_TOKEN_KEY), 'Auth token should be null').to.be.null;
-    });
   });
 });
