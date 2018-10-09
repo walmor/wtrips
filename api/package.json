@@ -7,6 +7,9 @@
   "scripts": {
     "test": "jest --watch --runInBand",
     "start": "nodemon ./src/server.js --exec babel-node",
+    "debug-test": "node --inspect=0.0.0.0 --nolazy ./node_modules/.bin/jest --watch --no-cache --runInBand",
+    "debug-start": "yarn start --inspect=0.0.0.0 --nolazy",
+    "build": "babel src -d build --source-maps",
     "seed-db": "babel-node ./src/__tests__/utils/seed-db.js",
     "knex": "babel-node ./node_modules/knex/bin/cli.js",
     "mig:make": "yarn knex migrate:make",

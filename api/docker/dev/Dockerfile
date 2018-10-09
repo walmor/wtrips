@@ -7,5 +7,3 @@ WORKDIR /app/api
 COPY package.json yarn.* ./
 
 RUN yarn install && npm rebuild bcrypt --build-from-source && yarn cache clean
-
-EXPOSE 9229 9230

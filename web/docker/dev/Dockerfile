@@ -7,5 +7,3 @@ WORKDIR /app/web
 COPY package.json yarn.* ./
 
 RUN yarn install && yarn cache clean
-
-EXPOSE 9229 9230

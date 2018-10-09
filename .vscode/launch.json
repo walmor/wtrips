@@ -1,0 +1,49 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug Web - Chrome",
+      "url": "http://localhost:${env:WTRIPS_WEB_PORT}",
+      "webRoot": "${workspaceFolder}/web/src",
+      "sourceMapPathOverrides": {
+        "/app/web/src/*": "${webRoot}/*"
+      },
+      "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Tests - Docker",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dc:test:debug-test"],
+      "port": 9229,
+      "timeout": 20000,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/api",
+      "remoteRoot": "/app/api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug API - Docker",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dc:dev:debug-start"],
+      "port": 9229,
+      "restart": true,
+      "timeout": 20000,
+      "localRoot": "${workspaceFolder}/api",
+      "remoteRoot": "/app/api",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["node_modules/**/*.js", "<node_internals>/**/*.js"]
+    }
+  ]
+}
