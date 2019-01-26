@@ -1,0 +1,51 @@
+version: 2
+
+defaults: &defaults
+  machine: true
+  working_directory: ~/repo
+
+jobs:
+  unit_tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Build Docker Images (Test Env)
+          command: npm run dc:test build
+
+      - run:
+          name: Run Unit Tests
+          command: npm run dc:test:run-test
+
+  e2e_tests:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: Build Docker Images (Release Env)
+          command: npm run dc:rel build
+
+      - run:
+          name: Run E2E Tests
+          command: npm run dc:rel:run-e2e
+
+tag_filter: &tag_filter
+  branches:
+    # ignore any commit on any branch by default
+    ignore: /.*/
+  tags:
+    # only act on version tags
+    only: /^v[0-9]+(\.[0-9]+)*(-\w+\.[0-9]+)?$/
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - unit_tests:
+          filters:
+            branches:
+              only: circleci #test
+      - e2e_tests:
+          filters:
+            branches:
+              only: circleci #test
