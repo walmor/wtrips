@@ -1,0 +1,31 @@
+version: '3.7'
+
+x-node_env: &node_env
+  NODE_ENV: test
+
+services:
+  web:
+    image: wtrips-web:test
+    environment: *node_env
+    command: ['yarn', 'start']
+    volumes:
+      - ../../web:/app
+      - /app/node_modules
+
+  api:
+    image: wtrips-api:test
+    environment: *node_env
+    command: [sh, -c, 'yarn mig:checkdb && yarn start']
+    volumes:
+      - ../../api:/app
+      - /app/node_modules
+    expose:
+      - '9229' # Debug port
+    ports:
+      - '9229:9229' # Debug port
+
+  end2end:
+    environment: *node_env
+    volumes:
+      - ../../end2end:/end2end
+      - /end2end/node_modules

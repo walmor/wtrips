@@ -1,0 +1,24 @@
+version: '3.7'
+
+x-node_env: &node_env
+  NODE_ENV: release
+
+services:
+  web:
+    image: wtrips-web:release
+    environment: *node_env
+    build:
+      target: release
+
+  api:
+    image: wtrips-api:release
+    environment: *node_env
+    command: [node, server.js]
+    build:
+      target: release
+
+  end2end:
+    environment: *node_env
+    volumes:
+      - ../../end2end:/end2end
+      - /end2end/node_modules

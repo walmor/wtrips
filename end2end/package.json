@@ -1,0 +1,18 @@
+{
+  "name": "wtrips-end2end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Walmor Moreira",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "env-cmd": "^8.0.2"
+  },
+  "scripts": {
+    "cy:run": "env-cmd ./.env.local --no-override cypress run",
+    "cy:open": "env-cmd ./.env.local cypress open"
+  },
+  "devDependencies": {
+    "cypress": "^3.1.4"
+  }
+}

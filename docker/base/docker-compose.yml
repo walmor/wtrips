@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: ../../web/
+      dockerfile: ./Dockerfile # maybe could be removed
+      target: dev
+    environment:
+      PORT: ${WEB_PORT}
+      API_HOST: http://api:${API_PORT}
+    env_file:
+      - .env
+    expose:
+      - '${WEB_PORT}'
+    ports:
+      - '${WEB_PORT}:${WEB_PORT}'
+    # links:
+    #   - api
+    networks:
+      - wtrips-net
+    depends_on:
+      - api
+    stdin_open: true
+    tty: true
+
+  api:
+    build:
+      context: ../../api/
+      dockerfile: ./Dockerfile # maybe could be removed
+      target: dev
+    env_file:
+      - .env
+    expose:
+      - '${API_PORT}'
+    ports:
+      - '${API_PORT}:${API_PORT}'
+    #links:
+    #- postgres
+    networks:
+      - wtrips-net
+    depends_on:
+      - postgres
+    stdin_open: true
+    tty: true
+
+  postgres:
+    image: postgres:10.5-alpine
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - PGPORT=${DB_PORT}
+    expose:
+      - '${DB_PORT}'
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - wtrips-net
+
+  end2end:
+    image: wtrips-end2end
+    build:
+      context: ../../end2end/
+      dockerfile: ./Dockerfile
+    environment:
+      CYPRESS_BASE_URL: http://web:${WEB_PORT}
+    # links:
+    #   - web
+    networks:
+      - wtrips-net
+    depends_on:
+      - web
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres-data: {}
+
+networks:
+  wtrips-net:

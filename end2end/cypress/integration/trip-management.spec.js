@@ -9,8 +9,8 @@ function fillOutTripFormAndSubmit(method, alias, destination) {
 
   cy.get('.TripRangePicker').click();
 
-  cy.get('.ant-calendar-today').click();
-  cy.get('.ant-calendar-today')
+  cy.get('.ant-calendar-today:last').click();
+  cy.get('.ant-calendar-today:last')
     .parent()
     .next('tr')
     .children('td')
