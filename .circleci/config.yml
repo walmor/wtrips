@@ -23,7 +23,9 @@ jobs:
 
       - run:
           name: Build Docker Images (Test Env)
-          command: npm run dc:test build
+          command: |
+            touch ./docker/test/.env # Just an empty env file to avoid docker compose error
+            npm run dc:test build
 
       - run:
           name: Run Unit Tests
@@ -39,7 +41,9 @@ jobs:
 
       - run:
           name: Build Docker Images (Release Env)
-          command: npm run dc:rel build
+          command: |
+            touch ./docker/release/.env # Just an empty env file to avoid docker compose error
+            npm run dc:rel build
 
       - run:
           name: Run E2E Tests
