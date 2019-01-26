@@ -15,10 +15,10 @@ services:
       - '${WEB_PORT}'
     ports:
       - '${WEB_PORT}:${WEB_PORT}'
-    # links:
-    #   - api
-    networks:
-      - wtrips-net
+    links:
+      - api
+    # networks:
+    #   - wtrips-net
     depends_on:
       - api
     stdin_open: true
@@ -35,10 +35,10 @@ services:
       - '${API_PORT}'
     ports:
       - '${API_PORT}:${API_PORT}'
-    #links:
-    #- postgres
-    networks:
-      - wtrips-net
+    links:
+      - postgres
+    # networks:
+    #   - wtrips-net
     depends_on:
       - postgres
     stdin_open: true
@@ -56,8 +56,8 @@ services:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    networks:
-      - wtrips-net
+    # networks:
+    #   - wtrips-net
 
   end2end:
     image: wtrips-end2end
@@ -66,10 +66,10 @@ services:
       dockerfile: ./Dockerfile
     environment:
       CYPRESS_BASE_URL: http://web:${WEB_PORT}
-    # links:
-    #   - web
-    networks:
-      - wtrips-net
+    links:
+      - web
+    # networks:
+    #   - wtrips-net
     depends_on:
       - web
     stdin_open: true
@@ -77,6 +77,5 @@ services:
 
 volumes:
   postgres-data: {}
-
-networks:
-  wtrips-net:
+# networks:
+#   wtrips-net:
