@@ -4,11 +4,23 @@ defaults: &defaults
   machine: true
   working_directory: ~/repo
 
+update_docker_compose: &update_docker_compose
+  name: 'Update Docker Compose'
+  command: |
+    docker-compose --version
+    curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    docker-compose --version
+
 jobs:
   unit_tests:
     <<: *defaults
     steps:
       - checkout
+
+      - run:
+          <<: *update_docker_compose
+
       - run:
           name: Build Docker Images (Test Env)
           command: npm run dc:test build
@@ -21,6 +33,10 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+
+      - run:
+          <<: *update_docker_compose
+
       - run:
           name: Build Docker Images (Release Env)
           command: npm run dc:rel build
