@@ -62,6 +62,7 @@
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
       "<rootDir>/src/__tests__/utils/",
+      "<rootDir>/build/",
       "<rootDir>/node_modules/"
     ]
   }
