@@ -7,10 +7,10 @@
     "dc:dev": "cd ./docker/dev && docker-compose",
     "dc:test": "cd ./docker/test && docker-compose",
     "dc:rel": "cd ./docker/release && docker-compose",
-    "dc:rel:run-e2e": "yarn dc:test run --m end2end yarn cy:run",
-    "dc:test:run-test": "yarn dc:test run --rm api yarn test",
-    "dc:test:debug-test": "yarn dc:test run --rm --service-ports api yarn debug-test",
-    "dc:dev:debug-start": "yarn dc:dev run --rm --service-ports api yarn debug-start"
+    "dc:rel:run-e2e": "npm run dc:test run --m end2end yarn cy:run",
+    "dc:test:run-test": "npm run dc:test run --rm api yarn test",
+    "dc:test:debug-test": "npm run dc:test run --rm --service-ports api yarn debug-test",
+    "dc:dev:debug-start": "npm run dc:dev run --rm --service-ports api yarn debug-start"
   },
   "author": "Walmor Moreira",
   "license": "ISC",
