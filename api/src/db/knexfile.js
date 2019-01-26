@@ -1,4 +1,4 @@
-import config from './src/config';
+import config from '../config';
 
 module.exports = Object.assign({}, config.knex, {
   // The convertion to/from snake case cannot be used in migrations.

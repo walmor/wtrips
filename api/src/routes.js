@@ -10,7 +10,7 @@ router.use('/auth', AuthController);
 router.use('/users', UserController);
 router.use('/trips', TripController);
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV !== 'prod') {
   router.use('/tests', TestController);
 }
 

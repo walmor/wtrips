@@ -6,6 +6,7 @@
   "scripts": {
     "dc:dev": "cd ./docker/dev && docker-compose",
     "dc:test": "cd ./docker/test && docker-compose",
+    "dc:rel": "cd ./docker/release && docker-compose",
     "dc:test:run-test": "yarn dc:test run api yarn test",
     "dc:test:debug-test": "yarn dc:test run --rm --service-ports api yarn debug-test",
     "dc:dev:debug-start": "yarn dc:dev run --rm --service-ports api yarn debug-start"
