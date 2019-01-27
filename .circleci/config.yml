@@ -63,9 +63,7 @@ jobs:
 
       - run:
           name: Run E2E Tests
-          command: |
-            npm run dc:rel run --rm api yarn mig:latest 
-            npm run dc:rel:run-e2e
+          command: npm run dc:rel:run-e2e
 
 tag_filter: &tag_filter
   branches:
