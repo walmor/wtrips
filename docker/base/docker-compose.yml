@@ -6,6 +6,8 @@ services:
       context: ../../web/
       dockerfile: ./Dockerfile # maybe could be removed
       target: dev
+      cache_from:
+        - walmor/wtrips-web:latest
     environment:
       PORT: ${WEB_PORT}
       API_HOST: http://api:${API_PORT}
@@ -29,6 +31,8 @@ services:
       context: ../../api/
       dockerfile: ./Dockerfile # maybe could be removed
       target: dev
+      cache_from:
+        - walmor/wtrips-api:latest
     env_file:
       - .env
     expose:
