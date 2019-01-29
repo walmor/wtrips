@@ -7,6 +7,8 @@ services:
       dockerfile: ./Dockerfile # maybe could be removed
       target: dev
       cache_from:
+        - walmor/wtrips-web:latest-dev
+        - walmor/wtrips-web:latest-build
         - walmor/wtrips-web:latest
     environment:
       PORT: ${WEB_PORT}
@@ -32,6 +34,7 @@ services:
       dockerfile: ./Dockerfile # maybe could be removed
       target: dev
       cache_from:
+        - walmor/wtrips-api:latest-dev
         - walmor/wtrips-api:latest
     env_file:
       - .env
