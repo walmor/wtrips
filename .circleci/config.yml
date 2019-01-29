@@ -35,8 +35,8 @@ jobs:
       - run:
           name: Build Docker Images (Test Env)
           command: |
-            env
             env > ./docker/test/.env
+            docker pull walmor/wtrips-api:latest-dev
             npm run dc:test build
 
       - run:
@@ -81,7 +81,7 @@ workflows:
           filters:
             branches:
               only: circleci #test
-      - e2e_tests:
-          filters:
-            branches:
-              only: circleci #test
+      # - e2e_tests:
+      #     filters:
+      #       branches:
+      #         only: circleci #test
