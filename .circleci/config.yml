@@ -35,16 +35,16 @@ jobs:
       - run:
           name: Pull web images
           command: |
-            docker pull walmor/wtrips-web:latest-base
-            docker pull walmor/wtrips-web:latest-build
-            docker pull walmor/wtrips-web:latest
+            docker pull walmor/wtrips-web:latest-base || :
+            docker pull walmor/wtrips-web:latest-build || :
+            docker pull walmor/wtrips-web:latest || :
 
       - run:
           name: Pull api images
           command: |
-            docker pull walmor/wtrips-api:latest-base
-            docker pull walmor/wtrips-api:latest-build
-            docker pull walmor/wtrips-api:latest
+            docker pull walmor/wtrips-api:latest-base || :
+            docker pull walmor/wtrips-api:latest-build || :
+            docker pull walmor/wtrips-api:latest || :
 
       - run:
           name: Build the base layer of Docker images
