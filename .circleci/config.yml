@@ -68,9 +68,9 @@ jobs:
             env > ~/repo/docker/release/.env
             npm run dc:rel build
 
-      - run:
-          name: Run E2E tests
-          command: npm run dc:rel:run-e2e
+      # - run:
+      #     name: Run E2E tests
+      #     command: npm run dc:rel:run-e2e
 
       - run:
           name: Tag images
