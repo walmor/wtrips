@@ -5,7 +5,6 @@ x-node_env: &node_env
 
 services:
   web:
-    image: wtrips-web:dev
     environment: *node_env
     command: ['yarn', 'start']
     volumes:
@@ -13,7 +12,6 @@ services:
       - /app/node_modules
 
   api:
-    image: wtrips-api:dev
     environment: *node_env
     command: [sh, -c, 'yarn mig:checkdb && yarn start']
     volumes:

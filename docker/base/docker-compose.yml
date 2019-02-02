@@ -3,11 +3,12 @@ version: '3.7'
 services:
   web:
     build:
+      image: wtrips-web:base
       context: ../../web/
       dockerfile: ./Dockerfile # maybe could be removed
-      target: dev
+      target: base
       cache_from:
-        - walmor/wtrips-web:latest-dev
+        - walmor/wtrips-web:latest-base
     environment:
       PORT: ${WEB_PORT}
       API_HOST: http://api:${API_PORT}
@@ -17,10 +18,8 @@ services:
       - '${WEB_PORT}'
     ports:
       - '${WEB_PORT}:${WEB_PORT}'
-    links:
-      - api
-    # networks:
-    #   - wtrips-net
+    networks:
+      - wtrips-net
     depends_on:
       - api
     stdin_open: true
@@ -28,21 +27,20 @@ services:
 
   api:
     build:
+      image: wtrips-api:base
       context: ../../api/
       dockerfile: ./Dockerfile # maybe could be removed
-      target: dev
+      target: base
       cache_from:
-        - walmor/wtrips-api:latest-dev
+        - walmor/wtrips-api:latest-base
     env_file:
       - .env
     expose:
       - '${API_PORT}'
     ports:
       - '${API_PORT}:${API_PORT}'
-    links:
-      - postgres
-    # networks:
-    #   - wtrips-net
+    networks:
+      - wtrips-net
     depends_on:
       - postgres
     stdin_open: true
@@ -60,8 +58,8 @@ services:
       - '${DB_PORT}:${DB_PORT}'
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    # networks:
-    #   - wtrips-net
+    networks:
+      - wtrips-net
 
   end2end:
     image: wtrips-end2end
