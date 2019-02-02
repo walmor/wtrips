@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Build the base layer of Docker images
           command: |
-            env > ./docker/test/.env            
+            env > ./docker/test/.env
             npm run dc:test build
 
       - run:
@@ -59,12 +59,14 @@ jobs:
       - run:
           name: Build the intermediate layer of Docker images
           command: |
-            cd ./repo/web && docker build --target build -t wtrips-web:build .
-            cd ./repo/api && docker build --target build -t wtrips-api:build .
+            cd ~/repo/web && docker build --target build -t wtrips-web:build .
+            cd ~/repo/api && docker build --target build -t wtrips-api:build .
 
       - run:
           name: Build the release layer of Docker images
-          command: npm run dc:rel build
+          command: |
+            env > ~/repo/docker/release/.env
+            npm run dc:rel build
 
       - run:
           name: Run E2E tests
