@@ -76,17 +76,17 @@ jobs:
           name: Tag images
           command: |
             docker tag wtrips-api:base walmor/wtrips-api:latest-base
-            docker tag wtrips-web:base walmor/wtrips-api:latest-base
+            docker tag wtrips-web:base walmor/wtrips-web:latest-base
             docker tag wtrips-api:build walmor/wtrips-api:latest-build
-            docker tag wtrips-web:build walmor/wtrips-api:latest-build
+            docker tag wtrips-web:build walmor/wtrips-web:latest-build
             docker tag wtrips-api:release walmor/wtrips-api:latest
-            docker tag wtrips-web:release walmor/wtrips-api:latest
+            docker tag wtrips-web:release walmor/wtrips-web:latest
             docker tag wtrips-api:base walmor/wtrips-api:${CIRCLE_SHA1}-base
-            docker tag wtrips-web:base walmor/wtrips-api:${CIRCLE_SHA1}-base
+            docker tag wtrips-web:base walmor/wtrips-web:${CIRCLE_SHA1}-base
             docker tag wtrips-api:build walmor/wtrips-api:${CIRCLE_SHA1}-build
-            docker tag wtrips-web:build walmor/wtrips-api:${CIRCLE_SHA1}-build
+            docker tag wtrips-web:build walmor/wtrips-web:${CIRCLE_SHA1}-build
             docker tag wtrips-api:release walmor/wtrips-api:${CIRCLE_SHA1}
-            docker tag wtrips-web:release walmor/wtrips-api:${CIRCLE_SHA1}
+            docker tag wtrips-web:release walmor/wtrips-web:${CIRCLE_SHA1}
 
       - run:
           name: Push images to DockerHub
