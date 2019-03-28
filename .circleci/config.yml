@@ -21,7 +21,7 @@ update_docker_compose: &update_docker_compose
     docker-compose --version
 
 jobs:
-  unit_tests:
+  build_test_deploy:
     <<: *defaults
     steps:
       - checkout
@@ -35,44 +35,53 @@ jobs:
             env > ./docker/test/.env
             npm run dc:test build
       - run:
-          name: Run unit tests
-          command: npm run dc:test:run-test
-
-  e2e_tests:
-    <<: *defaults
-    steps:
-      - checkout
-      - run:
-          <<: *update_docker
-      - run:
-          <<: *update_docker_compose
-      - run:
           name: Build Docker Images (Release Env)
           command: |
-            env
             env > ./docker/release/.env
             npm run dc:rel build
       - run:
+          name: Run Unit Tests
+          command: npm run dc:test:run-test
+      - run:
           name: Run E2E Tests
           command: npm run dc:rel:run-e2e
-
-  deploy:
-    <<: *defaults
-    steps:
-      - checkout
       - run:
-          <<: *update_docker
-      - run:
-          <<: *update_docker_compose
-      - run:
-          name: Build Docker API Image (Release Env)
-          command: |
-            env
-            env > ./docker/release/.env
-            npm run dc:rel build api
-      - run:
-          name: 'Echo'
+          name: 'Deploy'
           command: echo "TODO - deploy to firebase and heroku"
+  # e2e_tests:
+  #   <<: *defaults
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         <<: *update_docker
+  #     - run:
+  #         <<: *update_docker_compose
+  #     - run:
+  #         name: Build Docker Images (Release Env)
+  #         command: |
+  #           env
+  #           env > ./docker/release/.env
+  #           npm run dc:rel build
+  #     - run:
+  #         name: Run E2E Tests
+  #         command: npm run dc:rel:run-e2e
+  # deployment:
+  #   <<: *defaults
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         <<: *update_docker
+  #     - run:
+  #         <<: *update_docker_compose
+  #     - run:
+  #         name: Build Docker API Image (Release Env)
+  #         command: |
+  #           env
+  #           env > ./docker/release/.env
+  #           npm run dc:rel build api
+  #     - run:
+  #         name: 'Echo'
+  #         command: echo "TODO - deploy to firebase and heroku"
 
 tag_filter: &tag_filter
   branches:
@@ -84,20 +93,20 @@ tag_filter: &tag_filter
 
 workflows:
   version: 2
-  tests_and_deploy:
+  build_test_deploy:
     jobs:
-      - unit_tests:
+      - build_test_deploy:
           filters:
             branches:
               only: heroku
-      - e2e_tests:
-          filters:
-            branches:
-              only: heroku
-      - deploy:
-          requires:
-            - unit_tests
-            - e2e_tests
-          filters:
-            branches:
-              only: heroku
+      # - e2e_tests:
+      #     filters:
+      #       branches:
+      #         only: heroku
+      # - deployment:
+      #     requires:
+      #       - unit_tests
+      #       # - e2e_tests
+      #     filters:
+      #       branches:
+      #         only: heroku

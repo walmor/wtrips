@@ -3,7 +3,6 @@ import * as url from 'url';
 import { knexSnakeCaseMappers } from 'objection';
 
 if (process.env.API_HOST === 'heroku') {
-  console.log('in heroku host');
   process.env.API_PORT = process.env.PORT;
 
   console.log('port:', process.env.PORT, process.env.API_PORT);
@@ -16,8 +15,6 @@ if (process.env.API_HOST === 'heroku') {
   process.env.DB_NAME = dburl.path.substr(1);
   process.env.DB_USER = dbuser;
   process.env.DB_PASSWORD = dbpass;
-} else {
-  console.log('not in heroku host');
 }
 
 const config = {
