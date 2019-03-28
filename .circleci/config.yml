@@ -21,107 +21,58 @@ update_docker_compose: &update_docker_compose
     docker-compose --version
 
 jobs:
-  tests_and_deploy:
+  unit_tests:
     <<: *defaults
     steps:
       - checkout
-
       - run:
           <<: *update_docker
-
       - run:
           <<: *update_docker_compose
-
       - run:
-          name: Pull web images
-          command: |
-            docker pull walmor/wtrips-web:latest-base || :
-            docker pull walmor/wtrips-web:latest-build || :
-            docker pull walmor/wtrips-web:latest || :
-
-      - run:
-          name: Pull api images
-          command: |
-            docker pull walmor/wtrips-api:latest-base || :
-            docker pull walmor/wtrips-api:latest-build || :
-            docker pull walmor/wtrips-api:latest || :
-
-      - run:
-          name: Build the base layer of Docker images
+          name: Build Docker Images (Test Env)
           command: |
             env > ./docker/test/.env
             npm run dc:test build
-
       - run:
           name: Run unit tests
           command: npm run dc:test:run-test
 
+  e2e_tests:
+    <<: *defaults
+    steps:
+      - checkout
       - run:
-          name: Build the intermediate layer of Docker images
-          command: |
-            cd ~/repo/web && docker build --target build -t wtrips-web:build .
-            cd ~/repo/api && docker build --target build -t wtrips-api:build .
-
+          <<: *update_docker
       - run:
-          name: Build the release layer of Docker images
+          <<: *update_docker_compose
+      - run:
+          name: Build Docker Images (Release Env)
           command: |
-            env > ~/repo/docker/release/.env
+            env
+            env > ./docker/release/.env
             npm run dc:rel build
-
-      # - run:
-      #     name: Run E2E tests
-      #     command: npm run dc:rel:run-e2e
-
       - run:
-          name: Tag images
-          command: |
-            docker tag wtrips-api:base walmor/wtrips-api:latest-base
-            docker tag wtrips-web:base walmor/wtrips-web:latest-base
-            docker tag wtrips-api:build walmor/wtrips-api:latest-build
-            docker tag wtrips-web:build walmor/wtrips-web:latest-build
-            docker tag wtrips-api:release walmor/wtrips-api:latest
-            docker tag wtrips-web:release walmor/wtrips-web:latest
-            docker tag wtrips-api:base walmor/wtrips-api:${CIRCLE_SHA1}-base
-            docker tag wtrips-web:base walmor/wtrips-web:${CIRCLE_SHA1}-base
-            docker tag wtrips-api:build walmor/wtrips-api:${CIRCLE_SHA1}-build
-            docker tag wtrips-web:build walmor/wtrips-web:${CIRCLE_SHA1}-build
-            docker tag wtrips-api:release walmor/wtrips-api:${CIRCLE_SHA1}
-            docker tag wtrips-web:release walmor/wtrips-web:${CIRCLE_SHA1}
+          name: Run E2E Tests
+          command: npm run dc:rel:run-e2e
 
+  deploy:
+    <<: *defaults
+    steps:
+      - checkout
       - run:
-          name: Push images to DockerHub
+          <<: *update_docker
+      - run:
+          <<: *update_docker_compose
+      - run:
+          name: Build Docker API Image (Release Env)
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-            docker push walmor/wtrips-web:latest-base
-            docker push walmor/wtrips-api:latest-base
-            docker push walmor/wtrips-web:latest-build
-            docker push walmor/wtrips-api:latest-build
-            docker push walmor/wtrips-web:latest
-            docker push walmor/wtrips-api:latest            
-            docker push walmor/wtrips-web:${CIRCLE_SHA1}-base
-            docker push walmor/wtrips-api:${CIRCLE_SHA1}-base
-            docker push walmor/wtrips-web:${CIRCLE_SHA1}-build
-            docker push walmor/wtrips-api:${CIRCLE_SHA1}-build
-            docker push walmor/wtrips-web:${CIRCLE_SHA1}
-            docker push walmor/wtrips-api:${CIRCLE_SHA1}
-
-  # e2e_tests:
-  #   <<: *defaults
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         <<: *update_docker
-  #     - run:
-  #         <<: *update_docker_compose
-  #     - run:
-  #         name: Build Docker Images (Release Env)
-  #         command: |
-  #           env
-  #           env > ./docker/release/.env
-  #           npm run dc:rel build
-  #     - run:
-  #         name: Run E2E Tests
-  #         command: npm run dc:rel:run-e2e
+            env
+            env > ./docker/release/.env
+            npm run dc:rel build api
+      - run:
+          name: 'Echo'
+          command: echo "TODO - deploy to firebase and heroku"
 
 tag_filter: &tag_filter
   branches:
@@ -135,11 +86,18 @@ workflows:
   version: 2
   tests_and_deploy:
     jobs:
-      - tests_and_deploy:
+      - unit_tests:
           filters:
             branches:
-              only: circleci #test
-      # - e2e_tests:
-      #     filters:
-      #       branches:
-      #         only: circleci #test
+              only: heroku
+      - e2e_tests:
+          filters:
+            branches:
+              only: heroku
+      - deploy:
+          requires:
+            - unit_tests
+            - e2e_tests
+          filters:
+            branches:
+              only: heroku
