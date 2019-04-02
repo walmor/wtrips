@@ -9,7 +9,6 @@ defaults: &defaults
 update_docker: &update_docker
   name: 'Update Docker'
   command: |
-    sleep(20)
     docker --version
     sudo apt-get update
     sudo apt-get install docker-ce
@@ -28,6 +27,8 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+
+      - sleep 20
 
       - run:
           <<: *update_docker
