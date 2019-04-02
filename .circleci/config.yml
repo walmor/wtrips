@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  heroku: circleci/heroku@0.0.6
 
 defaults: &defaults
   machine: true
@@ -28,8 +26,6 @@ jobs:
     steps:
       - checkout
 
-      - run: sleep 20
-
       - run:
           <<: *update_docker
       - run:
@@ -51,7 +47,7 @@ jobs:
           name: Run Unit Tests
           command: npm run dc:test:run-test
 
-      - heroku/install
+      #- heroku/install
 
       - run:
           name: 'Deploy API to Heroku'
