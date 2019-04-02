@@ -28,7 +28,7 @@ jobs:
     steps:
       - checkout
 
-      - sleep 20
+      - run: sleep 20
 
       - run:
           <<: *update_docker
