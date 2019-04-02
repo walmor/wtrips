@@ -26,12 +26,12 @@ jobs:
   build_test_deploy:
     <<: *defaults
     steps:
+      - checkout
+
       - run:
           <<: *update_docker
       - run:
           <<: *update_docker_compose
-
-      - checkout
 
       - run:
           name: Build Docker Images (Test Env)
