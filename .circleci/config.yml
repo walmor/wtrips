@@ -52,6 +52,10 @@ jobs:
           command: curl https://cli-assets.heroku.com/install.sh | sh
 
       - run:
+          name: Heroku Login
+          command: echo "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
+
+      - run:
           name: 'Deploy API to Heroku'
           command: |
             docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com 
