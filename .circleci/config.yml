@@ -36,32 +36,41 @@ jobs:
           command: |
             env > ./docker/test/.env
             npm run dc:test build api
+            
+      # - run:
+      #     name: Run Unit Tests
+      #     command: npm run dc:test:run-test
 
       - run:
           name: Build Docker Images (Release Env)
           command: |
             env > ./docker/release/.env
-            npm run dc:rel build api
+            npm run dc:rel build
 
-      - run:
-          name: Run Unit Tests
-          command: npm run dc:test:run-test
+      # - run:
+      #     name: Install Heroku
+      #     command: curl https://cli-assets.heroku.com/install.sh | sh
 
-      - run:
-          name: Install Heroku
-          command: curl https://cli-assets.heroku.com/install.sh | sh
+      # - run:
+      #     name: Heroku Login
+      #     command: echo -e "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
 
-      - run:
-          name: Heroku Login
-          command: echo -e "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
-
-      - run:
-          name: 'Deploy API to Heroku'
-          command: |
-            docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com 
-            docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
-            docker push registry.heroku.com/wtrips-demo/web
-            heroku container:release web --app wtrips-demo
+      # - run:
+      #     name: Deploy API to Heroku
+      #     command: |
+      #       docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com 
+      #       docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
+      #       docker push registry.heroku.com/wtrips-demo/web
+      #       heroku container:release web --app wtrips-demo
+      
+        - run:
+            name: Install Firebase CLI
+            command: npm install -g firebase-tools
+            
+        - run:
+            name: Deploy Front-End to Firebase
+            command: cd ./web && firebase deploy --token "$FIREBASE_TOKEN"
+            # todo add the message with the version -m "$CIRCLE_XXXX"
 
 tag_filter: &tag_filter
   branches:
