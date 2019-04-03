@@ -57,7 +57,7 @@ jobs:
             docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com 
             docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
             docker push registry.heroku.com/wtrips-demo/web
-            heroku container:release web
+            heroku container:release web --app wtrips-demo
 
 tag_filter: &tag_filter
   branches:
