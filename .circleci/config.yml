@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  heroku: circleci/heroku@0.0.6
 
 defaults: &defaults
   machine: true
@@ -37,7 +35,7 @@ jobs:
           name: Build Docker Images (Test Env)
           command: |
             env > ./docker/test/.env
-            npm run dc:test build
+            npm run dc:test build api
 
       - run:
           name: Build Docker Images (Release Env)
@@ -49,7 +47,9 @@ jobs:
           name: Run Unit Tests
           command: npm run dc:test:run-test
 
-      - heroku/install
+      - run:
+          name: Install Heroku
+          command: curl https://cli-assets.heroku.com/install.sh | sh
 
       - run:
           name: 'Deploy API to Heroku'
