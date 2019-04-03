@@ -53,10 +53,7 @@ jobs:
 
       - run:
           name: Heroku Login
-          command: |
-            echo "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
-            cat ~/.netrc
-            echo $HEROKU_API_KEY
+          command: echo -e "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
 
       - run:
           name: 'Deploy API to Heroku'
