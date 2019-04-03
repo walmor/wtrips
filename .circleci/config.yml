@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  heroku: circleci/heroku@0.0.6
 
 defaults: &defaults
   machine: true
@@ -47,13 +49,13 @@ jobs:
           name: Run Unit Tests
           command: npm run dc:test:run-test
 
-      #- heroku/install
+      - heroku/install
 
       - run:
           name: 'Deploy API to Heroku'
           command: |
             docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com 
-            docker tag release_api_1 registry.heroku.com/wtrips-demo/web
+            docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
             docker push registry.heroku.com/wtrips-demo/web
             heroku container:release web
 
