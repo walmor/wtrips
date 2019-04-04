@@ -64,7 +64,7 @@ jobs:
       #       heroku container:release web --app wtrips-demo
       - run:
           name: Deploy Front-End to Firebase
-          command: docker run --rm --env-file ~/repo/docker/release/.env wtrips-web:build yarn deploy
+          command: docker run --rm --env FIREBASE_TOKEN=$FIREBASE_TOKEN wtrips-web:build yarn deploy
           # todo add the message with the version -m "$CIRCLE_XXXX"
 
 tag_filter: &tag_filter

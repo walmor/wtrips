@@ -1,6 +1,6 @@
 const config = {
   dateFormat: 'll',
-  apiBaseEndPoint: process.env.REACT_APP_API_PROD_HOST || '/api',
+  apiBaseEndPoint: '/api',
 };
 
 export default config;
