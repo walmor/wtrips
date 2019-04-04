@@ -45,7 +45,7 @@ jobs:
           name: Build Docker Web Images
           command: |
             env > ./docker/release/.env
-            cd ~/repo/web && docker build --target=build -t wtrips-web:build .
+            cd ~/repo/web && docker build --build-arg API_PROD_HOST=$API_PROD_HOST --target=build -t wtrips-web:build .
 
       # - run:
       #     name: Install Heroku

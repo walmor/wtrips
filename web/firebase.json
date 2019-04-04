@@ -2,13 +2,6 @@
   "hosting": {
     "public": "build",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "redirects": [
-      {
-        "source": "/api/:path*",
-        "destination": "https://wtrips-demo.herokuapp.com/api/:path",
-        "type": 301
-      }
-    ],
     "rewrites": [
       {
         "source": "**",

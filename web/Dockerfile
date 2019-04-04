@@ -11,6 +11,8 @@ RUN yarn install && yarn cache clean
 
 FROM base as build
 
+ENV REACT_APP_API_PROD_HOST=$API_PROD_HOST
+
 COPY . .
 
 RUN yarn build
