@@ -1,71 +1,65 @@
 version: 2.1
 
-defaults: &defaults
-  machine: true
-  working_directory: ~/repo
-
-update_docker: &update_docker
-  name: 'Update Docker'
-  command: |
-    docker --version
-    sudo apt-get update
-    sudo apt-get install docker-ce
-    docker --version
-
-update_docker_compose: &update_docker_compose
-  name: 'Update Docker Compose'
-  command: |
-    docker-compose --version    
-    sudo curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-    docker-compose --version
-
 jobs:
   build_test_deploy:
-    <<: *defaults
+    machine: true
+    working_directory: ~/repo
     steps:
       - checkout
 
       - run:
-          <<: *update_docker
-      - run:
-          <<: *update_docker_compose
+          name: 'Update Docker'
+          command: |
+            docker --version
+            sudo apt-get update
+            sudo apt-get install docker-ce
+            docker --version
 
       - run:
-          name: Build Docker API Images
+          name: 'Update Docker Compose'
+          command: |
+            docker-compose --version    
+            sudo curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            docker-compose --version
+
+      - run:
+          name: Build Docker Test Images
           command: |
             env > ./docker/test/.env
             npm run dc:test build api
 
-      # - run:
-      #     name: Run Unit Tests
-      #     command: npm run dc:test:run-test
+      - run:
+          name: Run Unit Tests
+          command: npm run dc:test:run-test
 
       - run:
-          name: Build Docker Web Images
+          name: Build Docker Release Images
           command: |
             env > ./docker/release/.env
+            npm run dc:rel build api
             cd ~/repo/web && docker build --build-arg API_PROD_HOST=$API_PROD_HOST --target=build -t wtrips-web:build .
 
-      # - run:
-      #     name: Install Heroku
-      #     command: curl https://cli-assets.heroku.com/install.sh | sh
-
-      # - run:
-      #     name: Heroku Login
-      #     command: echo -e "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
-
-      # - run:
-      #     name: Deploy API to Heroku
-      #     command: |
-      #       docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com
-      #       docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
-      #       docker push registry.heroku.com/wtrips-demo/web
-      #       heroku container:release web --app wtrips-demo
       - run:
-          name: Deploy Front-End to Firebase
-          command: docker run --rm --env FIREBASE_TOKEN=$FIREBASE_TOKEN wtrips-web:build yarn deploy
-          # todo add the message with the version -m "$CIRCLE_XXXX"
+          name: Install Heroku
+          command: curl https://cli-assets.heroku.com/install.sh | sh
+
+      - run:
+          name: Log in to Heroku
+          command: |
+            echo -e "machine api.heroku.com\n  login $HEROKU_LOGIN\n  password $HEROKU_TOKEN" > ~/.netrc
+            docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com
+
+      - run:
+          name: Deploy Backend to Heroku
+          command: |
+            docker tag wtrips-api:release registry.heroku.com/wtrips-demo/web
+            docker push registry.heroku.com/wtrips-demo/web
+            heroku container:release web --app wtrips-demo
+
+      - run:
+          name: Deploy Frontend to Firebase
+          command: docker run --rm --env FIREBASE_TOKEN=$FIREBASE_TOKEN wtrips-web:build yarn deploy -m $CIRCLE_SHA1
 
 tag_filter: &tag_filter
   branches:
