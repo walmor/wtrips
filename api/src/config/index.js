@@ -1,5 +1,21 @@
 import path from 'path';
+import * as url from 'url';
 import { knexSnakeCaseMappers } from 'objection';
+
+if (process.env.API_HOST === 'heroku') {
+  process.env.API_PORT = process.env.PORT;
+
+  console.log('port:', process.env.PORT, process.env.API_PORT);
+
+  const dburl = url.parse(process.env.DATABASE_URL);
+  const [dbuser, dbpass] = dburl.auth.split(':');
+
+  process.env.DB_HOST = dburl.hostname;
+  process.env.DB_PORT = dburl.port;
+  process.env.DB_NAME = dburl.path.substr(1);
+  process.env.DB_USER = dbuser;
+  process.env.DB_PASSWORD = dbpass;
+}
 
 const config = {
   app: {

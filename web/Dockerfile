@@ -1,4 +1,4 @@
-FROM node:8.12.0-alpine as dev
+FROM node:8.12.0-alpine as base
 
 RUN apk --no-cache add yarn git
 
@@ -9,7 +9,11 @@ COPY package.json yarn.* ./
 RUN yarn install && yarn cache clean
 
 
-FROM dev as build
+FROM base as build
+
+ARG API_PROD_HOST
+
+ENV REACT_APP_API_PROD_HOST=$API_PROD_HOST
 
 COPY . .
 

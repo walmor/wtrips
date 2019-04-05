@@ -2,10 +2,11 @@ version: '3.7'
 
 services:
   web:
+    image: wtrips-web:base
     build:
       context: ../../web/
       dockerfile: ./Dockerfile # maybe could be removed
-      target: dev
+      target: base
     environment:
       PORT: ${WEB_PORT}
       API_HOST: http://api:${API_PORT}
@@ -15,8 +16,6 @@ services:
       - '${WEB_PORT}'
     ports:
       - '${WEB_PORT}:${WEB_PORT}'
-    # links:
-    #   - api
     networks:
       - wtrips-net
     depends_on:
@@ -25,18 +24,17 @@ services:
     tty: true
 
   api:
+    image: wtrips-api:base
     build:
       context: ../../api/
       dockerfile: ./Dockerfile # maybe could be removed
-      target: dev
+      target: base
     env_file:
       - .env
     expose:
       - '${API_PORT}'
     ports:
       - '${API_PORT}:${API_PORT}'
-    #links:
-    #- postgres
     networks:
       - wtrips-net
     depends_on:
@@ -66,8 +64,6 @@ services:
       dockerfile: ./Dockerfile
     environment:
       CYPRESS_BASE_URL: http://web:${WEB_PORT}
-    # links:
-    #   - web
     networks:
       - wtrips-net
     depends_on:
