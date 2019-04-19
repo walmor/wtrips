@@ -6,8 +6,8 @@ It's a simple app to manage trips using hierarchical role-based access control. 
 
 ## Online Demo
 
-URL: https://wtrips-demo.firebaseapp.com/\
-User: admin@example.com\
+URL: https://wtrips-demo.firebaseapp.com/<br/>
+User: admin@example.com<br/>
 Password: 123456
 
 ## Front-end
