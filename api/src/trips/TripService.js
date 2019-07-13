@@ -190,6 +190,8 @@ class TripService {
       } else {
         throw new Forbidden('Access denied');
       }
+
+      delete data.userId;
     } else {
       data.user = this.currUser;
     }

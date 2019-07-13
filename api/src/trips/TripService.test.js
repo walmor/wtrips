@@ -100,7 +100,7 @@ describe('The TripService', () => {
       expect(acl.default).toHaveBeenCalled();
     });
 
-    it('should not allow a regular user create trip for any other user', async () => {
+    it('should not allow a regular user to create a trip for any other user', async () => {
       const { service } = await getServiceWithCurrUsr();
       const user2 = await createUser();
 
@@ -114,6 +114,19 @@ describe('The TripService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(Forbidden);
       }
+    });
+
+    it('should allow an admin user to create a trip for any other user', async () => {
+      const { service } = await getServiceWithCurrUsr({ role: 'admin' });
+      const user2 = await createUser();
+
+      const tripData = getTripData();
+      tripData.userId = user2.id;
+
+      const trip = await service.create(tripData);
+
+      expect(trip).toBeDefined();
+      expect(trip.id).toBeGreaterThan(0);
     });
   });
 
