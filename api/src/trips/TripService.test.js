@@ -19,8 +19,8 @@ beforeEach(async () => {
   acl.default.mockClear();
 });
 
-async function getServiceWithCurrUsr() {
-  const currUser = await createUser();
+async function getServiceWithCurrUsr(userData) {
+  const currUser = await createUser(userData);
 
   const service = new TripService(currUser);
 
@@ -517,6 +517,36 @@ describe('The TripService', () => {
 
       expect(result.trips[0].user.name).toBe(currUser.name);
       expect(result.trips[0].user.id).toEqual(currUser.id);
+    });
+
+    it('should return trips of all users when signed in as admin', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr({ role: 'admin' });
+
+      const manager = await createUser({ role: 'manager' });
+      const regularUser = await createUser({ role: 'user' });
+
+      await createTrip({ user: currUser });
+      await createTrip({ user: manager });
+      await createTrip({ user: regularUser });
+
+      const result = await service.list();
+
+      expect(result.trips.length).toBe(3);
+    });
+
+    it('should only return own trips when signed in as a regular user', async () => {
+      const { currUser, service } = await getServiceWithCurrUsr({ role: 'user' });
+
+      const admin = await createUser({ role: 'admin' });
+      const manager = await createUser({ role: 'manager' });
+
+      await createTrip({ user: currUser });
+      await createTrip({ user: admin });
+      await createTrip({ user: manager });
+
+      const result = await service.list();
+
+      expect(result.trips.length).toBe(1);
     });
   });
 

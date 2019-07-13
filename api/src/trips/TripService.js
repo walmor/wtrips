@@ -163,14 +163,16 @@ class TripService {
   sanitizeUserIdFilter(opts) {
     let userId = this.currUser.id;
 
-    if (this.currUser.role === 'admin' && opts.userId) {
-      const optsUserId = parseInt(opts.userId, 10);
+    if (this.currUser.role === 'admin') {
+      userId = null;
 
-      if (!Number.isInteger(optsUserId)) {
-        throw new BadRequest('Invalid user id.');
+      if (opts.userId) {
+        userId = parseInt(opts.userId, 10);
+
+        if (!Number.isInteger(userId)) {
+          throw new BadRequest('Invalid user id.');
+        }
       }
-
-      userId = optsUserId || null;
     }
 
     return userId;
